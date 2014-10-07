@@ -1,0 +1,32 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <item name="actionBarStyle">@style/ActionBar.Solid.Wspr</item>
+    </style>
+
+    <style name="WsprTheme" parent="AppTheme">
+        <item name="actionBarStyle">@style/ActionBar.Solid.Wspr.NoTitle</item>
+    </style>
+
+    <style name="ActionBar.Solid.Wspr" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
+        <item name="background">@color/wspr_blue</item>
+    </style>
+
+    <style name="ActionBar.Solid.Wspr.NoTitle" parent="@style/ActionBar.Solid.Wspr">
+        <item name="displayOptions">useLogo|showHome</item>
+        <item name="logo">@drawable/ic_logo</item>
+    </style>
+
+    <!-- Style for wspr listview -->
+    <style name="WsprListStyle">
+        <!-- Here it's a stub.  In screens of sufficient width, this style includes modifications
+        for two-pane layout -->
+    </style>
+
+    <style name="Divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:background">@color/wspr_blue</item>
+    </style>
+</resources>

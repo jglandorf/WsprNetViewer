@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- The action_debug menu is only turned on for BuildConfig.DEBUG. -->
+    <item
+        android:id="@+id/action_debug"
+        android:title="@string/action_debug"
+        android:enabled="false"
+        android:visible="false" >
+        <menu>
+
+            <item
+                android:id="@+id/action_refresh"
+                android:title="@string/action_refresh"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_dumpdb"
+                android:title="@string/action_dumpdb"
+                app:showAsAction="never" />
+
+            <item
+                android:id="@+id/action_cleardb"
+                android:title="@string/action_cleardb"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+
+</menu>

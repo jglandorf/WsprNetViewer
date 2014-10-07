@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditTextPreference
+        android:title="@string/pref_gridsquare_label"
+        android:key="@string/pref_gridsquare_key"
+        android:defaultValue="@string/pref_gridsquare_default"
+        android:inputType="text"
+        android:singleLine="true" />
+
+    <ListPreference
+        android:title="@string/pref_units_label"
+        android:key="@string/pref_units_key"
+        android:defaultValue="@string/pref_units_metric"
+        android:entryValues="@array/pref_units_values"
+        android:entries="@array/pref_units_options" />
+
+    <PreferenceScreen
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:title="@string/pref_notifications_label"
+        android:key="@string/pref_notifications_key" >
+
+        <CheckBoxPreference
+            android:title="@string/pref_enable_notifications_label"
+            android:key="@string/pref_enable_notifications_key"
+            android:summaryOff="@string/pref_enable_notifications_false"
+            android:summaryOn="@string/pref_enable_notifications_true"
+            android:defaultValue="@string/pref_enable_notifications_default" />
+
+        <ListPreference
+            android:title="@string/pref_notify_min_snr_label"
+            android:key="@string/pref_notify_min_snr_key"
+            android:defaultValue="@string/pref_min_snr_value_p0"
+            android:entryValues="@array/pref_notify_min_snr_values"
+            android:entries="@array/pref_notify_min_snr_options" />
+
+        <ListPreference
+            android:title="@string/pref_notify_band_label"
+            android:key="@string/pref_notify_band_key"
+            android:defaultValue="@string/pref_band_value_40m"
+            android:entryValues="@array/pref_notify_band_values"
+            android:entries="@array/pref_notify_band_options" />
+    </PreferenceScreen>
+
+    <ListPreference
+        android:title="@string/pref_recent_label"
+        android:key="@string/pref_recent_key"
+        android:defaultValue="@string/pref_recent_1hour"
+        android:entryValues="@array/pref_cutoff_values"
+        android:entries="@array/pref_cutoff_options" />
+
+    <ListPreference
+        android:title="@string/pref_update_interval_label"
+        android:key="@string/pref_update_interval_key"
+        android:defaultValue="@string/pref_recent_1hour"
+        android:entryValues="@array/pref_update_interval_values"
+        android:entries="@array/pref_update_interval_options" />
+
+</PreferenceScreen>

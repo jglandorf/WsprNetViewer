@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+
+    <!--
+         Used in Action Bar, and in AndroidManifest to tell the device the name of this app.
+         It's to keep this short, so your launcher icon isn't displayed with "The greatest Wea"
+         or something similar.
+    -->
+    <string name="app_name">WsprNet Viewer</string>
+    <string name="version">version</string>
+    <string name="app_descrip">WsprNetViewer retrieves WSPR (weak-signal propagation report) real-time amateur
+        radio signal propagation reports from wsprnet.org.  Tapping on a report displays more information about it,
+        along with a world map identifying the transmitter and receiver locations.
+        \u000a73 de Joe, AC8ES.
+    </string>
+    <string name="app_credits">Uses:\u000a icons8 icons8.com/license \u000a jsoup  jsoup.org \u000a map image http://en.wikipedia.org/wiki/Maidenhead_Locator_System
+    </string>
+
+    <!--
+         By convention, "action" denotes that this String will be used as the label for an Action,
+         typically from the action bar.  The ActionBar is limited real estate, so shorter is better.
+    -->
+    <string name="action_about">About</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_map">Map Gridsquare</string>
+    <string name="action_map_tx">Map Tx Gridsquare</string>
+    <string name="action_map_rx">Map Rx Gridsquare</string>
+    <string name="action_share">Share</string>
+    <!-- Menu label to fetch updated wspr info from the server -->
+    <string name="action_debug" translatable="false">Debug only</string>
+    <string name="action_refresh" translatable="false">Get WSPR data</string>
+    <!-- Menu labels to debug wspr db -->
+    <string name="action_dumpdb" translatable="false">Dump database</string>
+    <string name="action_cleardb" translatable="false">Clear database</string>
+
+    <string name="title_activity_detail">Details</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Label for the gridsquare preference [CHAR LIMIT=30] -->
+    <string name="pref_gridsquare_label">My gridsquare</string>
+
+    <!-- Key name for storing gridsquare in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_gridsquare_key" translatable="false">gridsquare</string>
+
+    <!-- Default gridsquare preference (ZIP code 48108) [CHAR LIMIT=NONE] -->
+    <!-- Hilden, Germany:  JO31le -->
+    <!-- Ann Arbor, MI: EN82df -->
+    <!-- Logneveien, Norway: JO59bh -->
+    <string name="pref_gridsquare_default" translatable="false">JO59bh</string>
+
+    <!-- Strings related to Notification preference -->
+    <string name="pref_last_notification">last_sync</string>
+
+    <!-- Notification Format -->
+    <string name="band_open">Band is open!</string>
+    <string name="format_notification">
+        WSPR: <xliff:g id="description">%1$s</xliff:g>
+        band: <xliff:g id="bandName">%2$s</xliff:g>
+        SNR: <xliff:g id="snr">%3$s</xliff:g>
+    </string>
+
+     <!-- Strings related to Notification Enabled preference -->
+     <string name="pref_notifications_key" translatable="false">notifications_key</string>
+     <string name="pref_notifications_label">WSPR Notifications</string>
+     <string name="pref_enable_notifications_key" translatable="false">enable_notifications</string>
+     <string name="pref_enable_notifications_label">WSPR Notifications</string>
+     <string name="pref_enable_notifications_true">Enabled</string>
+     <string name="pref_enable_notifications_false">Not Enabled</string>
+     <string name="pref_enable_notifications_default" translatable="false">false</string>
+     <string name="pref_notify_band_label">Frequency band</string>
+     <string name="pref_notify_band_key">notify_band</string>
+    <string name="pref_notify_min_snr_label">Minimum SNR dBm</string>
+    <string name="pref_notify_min_snr_key">min_snr</string>
+    <!-- SNRs. Labels will be the same as the values! -->
+    <string name="pref_min_snr_value_m30">-30</string>
+    <string name="pref_min_snr_value_m20">-20</string>
+    <string name="pref_min_snr_value_m10">-10</string>
+    <string name="pref_min_snr_value_p0">0</string>
+    <string name="pref_min_snr_value_p10">10</string>
+    <string name="pref_min_snr_value_p20">20</string>
+    <string name="pref_min_snr_value_p30">30</string>
+    <!-- frequency bands-these must match the band values, below -->
+    <string name="pref_band_label_LF">LF</string>
+    <string name="pref_band_label_MF">MF</string>
+    <string name="pref_band_label_160m">160m</string>
+    <string name="pref_band_label_80m">80m</string>
+    <string name="pref_band_label_60m">60m</string>
+    <string name="pref_band_label_40m">40m</string>
+    <string name="pref_band_label_30m">30m</string>
+    <string name="pref_band_label_20m">20m</string>
+    <string name="pref_band_label_17m">17m</string>
+    <string name="pref_band_label_15m">15m</string>
+    <string name="pref_band_label_12m">12m</string>
+    <string name="pref_band_label_10m">10m</string>
+    <string name="pref_band_label_6m">6m</string>
+    <string name="pref_band_label_4m">4m</string>
+    <string name="pref_band_label_2m">2m</string>
+    <string name="pref_band_label_70cm">70cm</string>
+    <string name="pref_band_label_23cm">23cm</string>
+    <!-- frequency values are the approximate center of the band-these must match the band names above -->
+    <string name="pref_band_value_LF">0.5</string>
+    <string name="pref_band_value_MF">0.5</string>
+    <string name="pref_band_value_160m">1.85</string>
+    <string name="pref_band_value_80m">3.7</string>
+    <string name="pref_band_value_60m">5.35</string>
+    <string name="pref_band_value_40m">7.125</string>
+    <string name="pref_band_value_30m">10.125</string>
+    <string name="pref_band_value_20m">14.175</string>
+    <string name="pref_band_value_17m">18.11</string>
+    <string name="pref_band_value_15m">21.225</string>
+    <string name="pref_band_value_12m">24.93</string>
+    <string name="pref_band_value_10m">28.85</string>
+    <string name="pref_band_value_6m">52</string>
+    <string name="pref_band_value_4m">70</string>
+    <string name="pref_band_value_2m">146</string>
+    <string name="pref_band_value_70cm">432</string>
+    <string name="pref_band_value_23cm">1270</string>
+
+    <!-- wsprnet.org/olddb permits queries -->
+    <string name="url_wsprnet_spots_old_base" formatted="false">http://wsprnet.org/olddb</string>
+    <string name="url_wsprnet_spots_old" formatted="false">http://wsprnet.org/olddb?mode=html\u0026band=all\u0026limit=500\u0026findcall=\u0026findreporter=\u0026sort=date</string>
+    <!-- wsprnet.org/drupal/wsprnet/spots permits queries only through the Drupal forms interface -->
+    <string name="url_wsprnet_spots">http://wsprnet.org/drupal/wsprnet/spots</string>
+    <string name="file_wsprnet_spots_prefix">file:</string>
+    <string name="file_wsprnet_spots">file:Database _ WSPRnet.htm</string>
+    <string name="html_wsprnet_spots_prefix">html:</string>
+    <!-- Sample web page #1 from http://www.wsprnet.org/drupal/wsprnet/spots -->
+    <!-- View page source from Firefox/Chrome (<ctrl><U>), then encode using Notepad++...Plug-ins...mime tools...full URL encode -->
+    <string name="html_wsprnet_spots_data11"></string>
+    <string name="html_wsprnet_spots_data12"></string>
+    <string name="html_wsprnet_spots_data13"></string>
+    <string name="html_wsprnet_spots_data14"></string>
+    <!-- 'Empty' web page; this is the default data if the live website access fails. -->
+    <string name="html_empty_page">%20%20%20%20%20%20%20%20%3C%21%44%4F%43%54%59%50%45%20%68%74%6D%6C%20%50%55%42%4C%49%43%20%22%2D%2F%2F%57%33%43%2F%2F%44%54%44%20%58%48%54%4D%4C%2B%52%44%46%61%20%31%2E%30%2F%2F%45%4E%22%20%20%22%68%74%74%70%3A%2F%2F%77%77%77%2E%77%33%2E%6F%72%67%2F%4D%61%72%6B%55%70%2F%44%54%44%2F%78%68%74%6D%6C%2D%72%64%66%61%2D%31%2E%64%74%64%22%3E%0D%0A%20%20%20%20%20%20%20%20%3C%68%74%6D%6C%20%78%6D%6C%6E%73%3D%22%68%74%74%70%3A%2F%2F%77%77%77%2E%77%33%2E%6F%72%67%2F%31%39%39%39%2F%78%68%74%6D%6C%22%20%78%6D%6C%3A%6C%61%6E%67%3D%22%65%6E%22%20%76%65%72%73%69%6F%6E%3D%22%58%48%54%4D%4C%2B%52%44%46%61%20%31%2E%30%22%20%64%69%72%3D%22%6C%74%72%22%3E%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%62%6F%64%79%3E%20%20%3C%2F%62%6F%64%79%3E%0D%0A%20%20%20%20%20%20%20%20%3C%2F%68%74%6D%6C%3E</string>
+
+    <!-- Strings for formatting wspr-related data -->
+
+    <!-- Label for the units preference [CHAR LIMIT=30] -->
+    <string name="pref_units_label">Units</string>
+    <!-- Label for metric option in unit preference [CHAR LIMIT=25] -->
+    <string name="pref_units_label_metric">Metric</string>
+    <!-- Label for english option in unit preference [CHAR LIMIT=25] -->
+    <string name="pref_units_label_english">English</string>
+    <!-- Key name for unit preference in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_units_key" translatable="false">units</string>
+    <!-- Value in SharedPreferences for metric unit option [CHAR LIMIT=NONE] -->
+    <string name="pref_units_metric" translatable="false">metric</string>
+    <!-- Value in SharedPreferences for english unit option [CHAR LIMIT=NONE] -->
+    <string name="pref_units_english" translatable="false">english</string>
+    <string name="_units_metric_distance" translatable="false">km</string>
+    <string name="_units_english_distance" translatable="false">mi</string>
+
+    <!-- discard wspr report data after -->
+    <string name="pref_recent_key" translatable="false">recent</string>
+    <string name="pref_recent_label">Discard data after</string>
+    <string name="pref_recent_label_24hour">24 hours</string>
+    <string name="pref_recent_label_12hour">12 hours</string>
+    <string name="pref_recent_label_8hour">8 hours</string>
+    <string name="pref_recent_label_4hour">4 hours</string>
+    <string name="pref_recent_label_1hour">1 hour</string>
+    <string name="pref_recent_label_30minute">30 minutes</string>
+    <string name="pref_recent_label_15minute">15 minutes</string>
+    <string name="pref_recent_label_6minute">6 minutes</string>
+    <string name="pref_recent_label_3minute">3 minutes</string>
+    <string name="pref_recent_24hour" translatable="false">86400</string>
+    <string name="pref_recent_12hour" translatable="false">43200</string>
+    <string name="pref_recent_8hour" translatable="false">28800</string>
+    <string name="pref_recent_4hour" translatable="false">14400</string>
+    <string name="pref_recent_1hour" translatable="false">3600</string>
+    <string name="pref_recent_30minute" translatable="false">1800</string>
+    <string name="pref_recent_15minute" translatable="false">900</string>
+    <string name="pref_recent_6minute" translatable="false">360</string>
+    <string name="pref_recent_3minute" translatable="false">180</string>
+    <!-- wspr update interval -->
+    <string name="pref_update_interval_key" translatable="false">interval</string>
+    <string name="pref_update_interval_label">Update interval</string>
+
+    <!-- database tags -->
+    <string name="unknown_city" translatable="false">-city-</string>
+    <string name="unknown_country" translatable="false">-country-</string>
+    <string name="unknown_city_country" translatable="false">city, country</string>
+
+    <!-- Language-specific constants -->
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+
+    <string name="utc" translatable="false">UTC</string>
+    <string name="gridsquare">Gridsquare</string>
+    <string name="wspr" translatable="false">WSPR</string>
+
+    <!-- Timestamp format [CHAR LIMIT=NONE] -->
+    <string name="format_full_friendly_timestamp">
+        <xliff:g id="month">%1$s</xliff:g>, <xliff:g id="day">%2$s</xliff:g>
+    </string>
+
+    <!-- Strings for formatting wspr-related data -->
+    <!-- Frequency (MHz) format [CHAR LIMIT=8 -->
+    <string name="format_frequency"><xliff:g id="freq">%1.03f</xliff:g></string>
+    <!-- Azimuth format [CHAR LIMIT=5 -->
+    <string name="format_azimuth"><xliff:g id="degrees">%1.0f</xliff:g>\u00B0</string>
+    <!-- Azimuth format [CHAR LIMIT=9 -->
+    <string name="degrees_azimuth">az</string>
+    <!-- TX Power format [CHAR LIMIT=5 -->
+    <string name="format_power"><xliff:g id="power">%1.03f</xliff:g></string>
+    <!-- SNR format [CHAR LIMIT=5 -->
+    <string name="format_snr"><xliff:g id="snr">%1.01f</xliff:g></string>
+    <!-- RX drift format [CHAR LIMIT=5 -->
+    <string name="format_drift"><xliff:g id="drift">%1.03f</xliff:g></string>
+
+    <!-- Distance formats -->
+    <!-- Distance in miles [CHAR LIMIT=16] -->
+    <string name="format_distance_miles"><xliff:g id="mi">%1$1.0f</xliff:g></string>
+    <!-- Distance in km [CHAR LIMIT=15] -->
+    <string name="format_distance_km"><xliff:g id="km">%1$1.0f</xliff:g></string>
+
+    <!-- RxGridsquare format CHAR LIMIT=25] -->
+    <string name="format_rx_gridsquare"><xliff:g id="gridsquare">%6s</xliff:g></string>
+    <!-- RxGridsquare format CHAR LIMIT=25] -->
+    <string name="format_tx_gridsquare"><xliff:g id="gridsquare">%6s</xliff:g></string>
+
+    <!-- RxCallsign format CHAR LIMIT=10]-->
+    <string name="format_rx_callsign"><xliff:g id="callsign">%10s</xliff:g></string>
+    <!-- TxCallsign format CHAR LIMIT=6]-->
+    <string name="format_tx_callsign"><xliff:g id="callsign">%6s</xliff:g></string>
+
+    <!-- Share format [CHAR LIMIT=NONE]-->
+    <string name="format_share">
+        Wspr: <xliff:g id="timestamp">%1$s</xliff:g>: <xliff:g id="description">%1$s</xliff:g> freq: <xliff:g id="freq">%2$s</xliff:g>
+        SNR: <xliff:g id="snr">%3$s</xliff:g>
+    </string>
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">wsprnetviewer.joe.glandorf1.com</string>
+    <string name="content_authority">"com.glandorf1.joe.wsprnetviewer.app"</string>
+</resources>

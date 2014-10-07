@@ -1,0 +1,73 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.glandorf1.joe.wsprnetviewer.app.MainActivity.WsprFragment">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/layout_list_header"
+        android:layout_gravity="top"
+        >
+
+        <TextView
+            android:id="@+id/textview_list_header_timezone"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="3"
+            android:fontFamily="sans-serif-condensed"
+            android:layout_gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="0dp"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:text="@string/utc"
+            android:gravity="left" />
+
+        <TextView
+            android:id="@+id/textview_list_header_gridsquare"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="4"
+            android:fontFamily="sans-serif-condensed"
+            android:layout_gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="0dp"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:text="@string/gridsquare"
+            android:gravity="center_horizontal" />
+
+        <TextView
+            android:id="@+id/textview_list_header_wspr"
+            android:layout_height="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:fontFamily="sans-serif-condensed"
+            android:layout_gravity="center"
+            android:paddingLeft="4dp"
+            android:paddingRight="0dp"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:text="@string/wspr"
+            android:gravity="center_horizontal" />
+
+    </LinearLayout>
+
+    <View style="@style/Divider"
+        android:id="@+id/layout_list_header_divider"
+        android:layout_below="@id/layout_list_header"
+        />
+
+    <ListView
+        style="@style/WsprListStyle"
+        android:id="@+id/listview_wspr"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/layout_list_header_divider"
+        android:divider="@color/wspr_blue"
+        android:dividerHeight="1px"
+        android:layout_gravity="bottom"
+        android:drawSelectorOnTop="false"
+        android:fastScrollEnabled="true" />
+
+</RelativeLayout>

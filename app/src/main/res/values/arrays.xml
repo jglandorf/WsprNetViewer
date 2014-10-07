@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="pref_units_options">
+        <item>@string/pref_units_label_metric</item>
+        <item>@string/pref_units_label_english</item>
+    </string-array>
+
+    <string-array name="pref_units_values">
+        <item>@string/pref_units_metric</item>
+        <item>@string/pref_units_english</item>
+    </string-array>
+
+    <string-array name="pref_cutoff_options">
+        <item>@string/pref_recent_label_24hour</item>
+        <item>@string/pref_recent_label_12hour</item>
+        <item>@string/pref_recent_label_8hour</item>
+        <item>@string/pref_recent_label_4hour</item>
+        <item>@string/pref_recent_label_1hour</item>
+        <item>@string/pref_recent_label_30minute</item>
+        <item>@string/pref_recent_label_15minute</item>
+    </string-array>
+
+    <string-array name="pref_cutoff_values">
+        <item>@string/pref_recent_24hour</item>
+        <item>@string/pref_recent_12hour</item>
+        <item>@string/pref_recent_8hour</item>
+        <item>@string/pref_recent_4hour</item>
+        <item>@string/pref_recent_1hour</item>
+        <item>@string/pref_recent_30minute</item>
+        <item>@string/pref_recent_15minute</item>
+    </string-array>
+
+
+    <string-array name="pref_update_interval_options">
+        <item>@string/pref_recent_label_24hour</item>
+        <item>@string/pref_recent_label_12hour</item>
+        <item>@string/pref_recent_label_1hour</item>
+        <item>@string/pref_recent_label_30minute</item>
+        <item>@string/pref_recent_label_15minute</item>
+        <item>@string/pref_recent_label_6minute</item>
+    </string-array>
+
+    <string-array name="pref_update_interval_values">
+        <item>@string/pref_recent_24hour</item>
+        <item>@string/pref_recent_12hour</item>
+        <item>@string/pref_recent_1hour</item>
+        <item>@string/pref_recent_30minute</item>
+        <item>@string/pref_recent_15minute</item>
+        <item>@string/pref_recent_6minute</item>
+    </string-array>
+
+    <string-array name="pref_notify_min_snr_options">
+        <item>@string/pref_min_snr_value_m30</item>
+        <item>@string/pref_min_snr_value_m20</item>
+        <item>@string/pref_min_snr_value_m10</item>
+        <item>@string/pref_min_snr_value_p0</item>
+        <item>@string/pref_min_snr_value_p10</item>
+        <item>@string/pref_min_snr_value_p20</item>
+        <item>@string/pref_min_snr_value_p30</item>
+    </string-array>
+    <string-array name="pref_notify_min_snr_values">
+        <item>@string/pref_min_snr_value_m30</item>
+        <item>@string/pref_min_snr_value_m20</item>
+        <item>@string/pref_min_snr_value_m10</item>
+        <item>@string/pref_min_snr_value_p0</item>
+        <item>@string/pref_min_snr_value_p10</item>
+        <item>@string/pref_min_snr_value_p20</item>
+        <item>@string/pref_min_snr_value_p30</item>
+    </string-array>
+
+    
+    <string-array name="pref_notify_band_options">
+        <item>@string/pref_band_label_LF</item>
+        <item>@string/pref_band_label_MF</item>
+        <item>@string/pref_band_label_160m</item>
+        <item>@string/pref_band_label_80m</item>
+        <item>@string/pref_band_label_40m</item>
+        <item>@string/pref_band_label_30m</item>
+        <item>@string/pref_band_label_20m</item>
+        <item>@string/pref_band_label_17m</item>
+        <item>@string/pref_band_label_15m</item>
+        <item>@string/pref_band_label_10m</item>
+        <item>@string/pref_band_label_6m</item>
+        <item>@string/pref_band_label_4m</item>
+        <item>@string/pref_band_label_2m</item>
+        <item>@string/pref_band_label_70cm</item>
+        <item>@string/pref_band_label_23cm</item>
+    </string-array>
+
+    <string-array name="pref_notify_band_values">
+        <item>@string/pref_band_value_LF</item>
+        <item>@string/pref_band_value_MF</item>
+        <item>@string/pref_band_value_160m</item>
+        <item>@string/pref_band_value_80m</item>
+        <item>@string/pref_band_value_40m</item>
+        <item>@string/pref_band_value_30m</item>
+        <item>@string/pref_band_value_20m</item>
+        <item>@string/pref_band_value_17m</item>
+        <item>@string/pref_band_value_15m</item>
+        <item>@string/pref_band_value_10m</item>
+        <item>@string/pref_band_value_6m</item>
+        <item>@string/pref_band_value_4m</item>
+        <item>@string/pref_band_value_2m</item>
+        <item>@string/pref_band_value_70cm</item>
+        <item>@string/pref_band_value_23cm</item>
+    </string-array>
+
+</resources>

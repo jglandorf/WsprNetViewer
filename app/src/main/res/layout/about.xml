@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+    <!-- For Android 2.3.4, set the background color, which otherwise comes out gray on black. -->
+    <LinearLayout
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+        <TextView
+            android:id="@+id/about_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="2dip"
+            android:paddingRight="2dip"
+            android:paddingTop="10dip"
+            android:textSize="16sp"
+            android:text="@string/app_descrip"
+            android:autoLink="web"
+            android:fontFamily="sans-serif-condensed" />
+
+        <TextView
+            android:id="@+id/about_credits"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="2dip"
+            android:paddingRight="2dip"
+            android:paddingTop="10dip"
+            android:textSize="16sp"
+            android:text="@string/app_credits"
+            android:autoLink="web"
+            android:fontFamily="sans-serif-condensed" />
+    </LinearLayout>
+</ScrollView>

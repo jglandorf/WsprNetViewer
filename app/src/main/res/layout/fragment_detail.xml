@@ -1,0 +1,401 @@
+<!-- Master layout. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:paddingLeft="2dp"
+            android:paddingRight="2dp"
+            android:layout_weight="3"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical">
+                <ImageView
+                    android:id="@+id/detail_icon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:src="@drawable/ic_clenched_fist" />
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/detail_timestamp_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:text="13:14"
+                android:paddingLeft="8dp"
+                android:paddingRight="0dp"
+                android:textAppearance="?android:textAppearanceMedium"
+                android:textStyle="bold"
+                android:layout_gravity="center" />
+
+            <TextView
+                android:id="@+id/detail_timestamp_label_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:text="UTC"
+                android:paddingLeft="2dp"
+                android:paddingRight="0dp"
+                android:textStyle="bold"
+                android:layout_gravity="center"
+                android:textAppearance="?android:textAppearanceSmall"/>
+
+            <TextView
+                android:id="@+id/detail_timeago_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="sans-serif-condensed"
+                android:text=" -2h:14m"
+                android:singleLine="false"
+                android:paddingLeft="8dp"
+                android:paddingRight="0dp"
+                android:textAppearance="?android:textAppearanceSmall"
+                android:textStyle="bold"
+                android:layout_gravity="center" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_weight="5"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/detail_tx_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="tx call:"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="2" />
+                <TextView
+                    android:id="@+id/detail_txcallsign_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="DL8EDC "
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5" />
+
+                <TextView
+                    android:id="@+id/detail_txat_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="grid:"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="2"
+                    android:gravity="right" />
+                <TextView
+                    android:id="@+id/detail_txgridsquare_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="JO31le"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+                <TextView
+                    android:id="@+id/detail_txcitycountry_label_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="qth:"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:textAppearance="?android:textAppearanceSmall"/>
+                <TextView
+                    android:id="@+id/detail_txcitycountry_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/unknown_city_country"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="4dp"
+                    android:textStyle="bold"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/detail_rx_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="rx call:"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="2" />
+                <TextView
+                    android:id="@+id/detail_rxcallsign_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="LA3JJ/L"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5" />
+
+                <TextView
+                    android:id="@+id/detail_rxat_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="grid:"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="2"
+                    android:gravity="right" />
+                <TextView
+                    android:id="@+id/detail_rxgridsquare_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="JO59bh"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="invisible">
+                <TextView
+                    android:id="@+id/detail_rxcitycountry_label_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="qth:"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:textAppearance="?android:textAppearanceSmall"/>
+                <TextView
+                    android:id="@+id/detail_rxcitycountry_textview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/unknown_city_country"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="4dp"
+                    android:textStyle="bold"
+                    />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="5"
+            android:layout_gravity="center"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/detail_txfreqmhz_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text=" 7.040"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5"
+                    android:gravity="center_vertical|right" />
+                <TextView
+                    android:id="@+id/detail_txfreqmhz_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="MHz"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="8dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical|left" />
+
+                <TextView
+                    android:id="@+id/detail_txpower_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5"
+                    android:gravity="center_vertical|right" />
+                <TextView
+                    android:id="@+id/detail_txpower_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="dBm tx"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical|left" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/detail_rxsnr_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="-4"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="0dp"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5"
+                    android:gravity="center_vertical|right" />
+                <TextView
+                    android:id="@+id/detail_rxsnr_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="dB SNR"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="8dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical|left" />
+
+                <TextView
+                    android:id="@+id/detail_distance_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="925"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5"
+                    android:gravity="center_vertical|right" />
+                <TextView
+                    android:id="@+id/detail_distance_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text=" km"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical|left" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:orientation="horizontal">
+                <TextView
+                    android:id="@+id/detail_rxdrift_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5"
+                    android:gravity="center_vertical|right" />
+                <TextView
+                    android:id="@+id/detail_rxdrift_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text=" drift"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="8dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_weight="3"
+                    android:gravity="center_vertical|left" />
+
+                <TextView
+                    android:id="@+id/detail_azimuth_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:text="11"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:typeface="monospace"
+                    android:textStyle="bold"
+                    android:layout_weight="5"
+                    android:gravity="center_vertical|right" />
+                <TextView
+                    android:id="@+id/detail_azimuth_label_textview"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed"
+                    android:text="@string/degrees_azimuth"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="0dp"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:gravity="center_vertical|left"
+                    android:layout_weight="3" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <!-- alternatively, use com.glandorf1.joe.wsprnetviewer.app.data.WsprNetCustomView -->
+            <!-- or ImageView -->
+            <com.glandorf1.joe.wsprnetviewer.app.data.WsprNetCustomView
+                android:id="@+id/detail_map"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/art_maidenhead" />
+        </FrameLayout>
+
+    </LinearLayout>
+</ScrollView>
