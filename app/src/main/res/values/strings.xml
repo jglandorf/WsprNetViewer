@@ -11,6 +11,7 @@
     <string name="app_descrip">WsprNetViewer retrieves WSPR (weak-signal propagation report) real-time amateur
         radio signal propagation reports from wsprnet.org.  Tapping on a report displays more information about it,
         along with a world map identifying the transmitter and receiver locations.
+        \u000aCarrier message and data rates may apply.
         \u000a73 de Joe, AC8ES.
     </string>
     <string name="app_credits">Uses:\u000a icons8 icons8.com/license \u000a jsoup  jsoup.org \u000a map image http://en.wikipedia.org/wiki/Maidenhead_Locator_System

@@ -64,7 +64,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final double mBandFrequencyTolerancePercent = 5.;
     private static Double[] mBandFrequency, mBandFrequencyMin, mBandFrequencyMax;
     private static String[] mBandFrequencyStr, mBandNameStr;
-    private static int mBandNameIdx = -1;
+    private static int mBandNameIdx = -1, nHits = -1;
 
     private Context mContext;
 
@@ -192,7 +192,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
     /**
      * Returns name of frequency band, or "" if not within a valid frequency band.
      * @param context
-     * @param idx - pass in 'mBandNameIdx', as set by getFrequencyBand()
+     * @param idx - pass in 'mBandNameIdx', as set by getFrequencyBandCheck()
      * @return Returns name of frequency band, or "" if not within a valid frequency band.
      */
     public String getFrequencyBandName(Context context, int idx) {
@@ -208,16 +208,17 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
     /**
-     * Determines is a frequency is in one of the bands in R.array.pref_notify_band_values.
-     * Frequency tolerance arrays are only calculated the first time this routine is called.
+     * Determines if a frequency is in one of the bands in R.array.pref_notify_band_values.
+     * Checks if it is also in the notification band-- if it is, then set mBandNameIdx
+     * and increment the number of hits, nHits.
      * @param context
      * @param freqMhz - a frequency in MHz as returned by a specific WSPR report
      * @param tolerancePercent - freqMhz is in the band if within +/-tolerance of the band's center frequency
-     * @return Returns -1 if not within a valid frequency band; also sets mBandNameIdx.
+     * @return Returns -1 if not within a valid frequency band; also sets mBandNameIdx, increments nHits.
      */
-    public double getFrequencyBand(Context context, double freqMhz, double tolerancePercent) {
+    public double getFrequencyBandCheck(Context context, double freqMhz, double tolerancePercent,
+                                        double notifyBandMHzMin, double notifyBandMHzMax) {
         double band = -1;
-        mBandNameIdx = -1;
         if ((mBandFrequencyStr == null) || (mBandFrequencyStr.length <= 0)) {
             Resources res = context.getResources();
             mBandFrequencyStr = res.getStringArray(R.array.pref_notify_band_values);
@@ -240,7 +241,10 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                 for (int i = 0; i < mBandFrequency.length; i++) {
                     if ((mBandFrequencyMin[i] <= freqMhz) && (freqMhz <= mBandFrequencyMax[i])) {
                         band = mBandFrequency[i];
-                        mBandNameIdx = i; // save for getFrequencyBandName()
+                        if ((notifyBandMHzMin <= band) && (band <= notifyBandMHzMax)) {
+                            mBandNameIdx = i; // save for getFrequencyBandName()
+                            nHits++;
+                        }
                         break;
                     }
                 }
@@ -325,11 +329,12 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         final int WSPRNET_IDX_OLDDB_DISTANCE_MILES = 11;
         
         // Notification calculations
-        int nHits = 0;
         double minSNR  = Utility.getNotifyMinSNR(context);
         double notifyBandMHz = Utility.getNotifyBand(context),
                 notifyBandMHzMin = notifyBandMHz - 0.001, notifyBandMHzMax = notifyBandMHz + 0.001;
         String bandName = "";
+        mBandNameIdx = -1; // reset which band was found for notification
+        nHits = 0;
 
         try {
             // TODO: get city name, lat/long from gridsquare; determine how to look this up
@@ -443,12 +448,10 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                 //         maybe to a particular region,
                 //         maybe some minimum number of reports at a minimum SNR.
                 if (rxSnr >= minSNR) {
-                    double bandMHz;
-                    if ((bandMHz = getFrequencyBand(context, txFreqMhz, mBandFrequencyTolerancePercent)) > 0.) {
-                        if ((notifyBandMHzMin <= bandMHz) && (bandMHz <= notifyBandMHzMax)) {
-                            nHits++;
-                        }
-                    }
+                    // getFrequencyBandCheck() will check what band the TX frequency is in, and if
+                    // it is in the notification band.
+                    double bandMHz = getFrequencyBandCheck(context, txFreqMhz, mBandFrequencyTolerancePercent,
+                            notifyBandMHzMin, notifyBandMHzMax);
                 }
             } // parse html tags
 
