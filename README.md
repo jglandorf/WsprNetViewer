@@ -27,8 +27,8 @@ WSPR receivers include the signal strength in their reports; this is equivalent 
   - fist: less than -15dBm ![fist](app/src/main/res/drawable-mdpi/ic_clenched_fist.png)
 
 On the Details screen, the transmitter and receiver locations are identified by these icons:
-  - Transmitter: ![main screen](screenshots/wsprnetViewerTxSymbol.png)
-  - Receiver: ![main screen](screenshots/wsprnetViewerRxSymbol.png)
+  - Transmitter: ![tx icon](screenshots/wsprnetViewerTxSymbol.png)
+  - Receiver: ![rx icon](screenshots/wsprnetViewerRxSymbol.png)
 
 #### About the "Maidenhead Locator System"
 Transmitter and receiver locations are reported and stored in the [Maidenhead Locator System](http://en.wikipedia.org/wiki/Maidenhead_Locator_System), a shorthand method of writing GPS coordinates using a combination of four or six numbers and letters.  Keeping the number of characters to transmit to a minimum is important when using low-speed communications such as Morse code, voice, or the WSPR protocol (which takes 110.6 seconds to transmit 50 bits or 1.5 bauds.)  Six characters identifies a longitude/latitude "grid square" of about 3 x 4 miles, which is sufficient resolution for propagation reports.  WsprNet Viewer displays the Maidenhead notation, but decodes it into longitude and latitude when marking locations on a map.
