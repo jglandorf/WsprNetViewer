@@ -5,12 +5,13 @@
 ## Synopsis
 WsprNet Viewer is an Android application that periodically retrieves and displays amateur radio ("ham radio") signal propagation reports from http://www.wsprnet.org.  Tapping on a specific report displays more information about it on a details screen, along with  a world map image identifying the  transmitter and receiver locations.  From the detail screen's menu,  you can share the report, or map the transmitter or receiver location using the Android device's map application.  The device can notify you when propagation is reported to be good  for a particular radio frequency band.
   
-  ![main screen](wsprnetViewerScreenSmall1Main.png)
-  ![details screen](wsprnetViewerScreenSmall2Details.png)
-  ![details screen map TX](wsprnetViewerScreenSmall4DetailsMapTx.png)
-  
-  ![notification settings screen](wsprnetViewerScreenSmall3NotificationSetup.png)
-  ![notifications screen](wsprnetViewerScreenSmall5Notification.png)
+  ![main screen](screenshots/wsprnetViewerScreenSmall7Main.png)
+  ![details screen](screenshots/wsprnetViewerScreenSmall8Details.png)
+  ![details screen map TX](screenshots/wsprnetViewerScreenSmall9DetailsMapTx.png)
+  ![notifications screen](screenshots/wsprnetViewerScreenSmall13DetailsMappedTxHiLite.png)
+
+  ![notification settings screen](screenshots/wsprnetViewerScreenSmall3NotificationSetup.png)
+  ![notifications screen](screenshots/wsprnetViewerScreenSmall5Notification.png)
 
 ### Background
 How well a radio signal travels ("propagates") is affected by its frequency (e.g., shortwave, VHF, UHF, microwave), distance, path, terrain, and atmospheric conditions between transmitter and receiver.  Radio waves tend to travel in straight lines.  For distances beyond the horizon (over ~20 miles), we might rely on them repeatedly bouncing between the ionosphere or other atmospheric phenomena, "hopping" along to a receiver.  Some aspects of this category of propagation are cyclical (as the sun rises and sets, or per 11-year sunspot cycles), but many are not so predictable and can vary in as little as a few minutes.
@@ -18,13 +19,17 @@ How well a radio signal travels ("propagates") is affected by its frequency (e.g
 It's useful to have an idea of current propagation conditions at various radio frequencies for points around the globe.  A network of amateur radio beacons and receivers exists that continuously track radio propagation; this information is reported to a central website at http://wsprnet.org. 
 
 #### About the Icons
-  WSPR receivers include the signal strength in their reports; this is equivalent to the "number of bars" displayed on a phone to indicate cell tower or WiFi signal strength.  To avoid confusion with these icons, WsprNet Viewer uses a hand holding up one to four fingers to indicate a good to poor signal; a clenched fist indicates a very poor signal:
-  - 4 fingers:  over 0dBm
-  - 3 fingers:   -5 to 0dBm
-  - 2 fingers:  -10 to -5dBm
-  - 1 fingers:  -15 to -10dBm
-  - fist: less than -15dBm
-  
+WSPR receivers include the signal strength in their reports; this is equivalent to the "number of bars" displayed on a phone to indicate cell tower or WiFi signal strength.  To avoid confusion with these icons, WsprNet Viewer uses a hand holding up one to four fingers to indicate a good to poor signal; a clenched fist indicates a very poor signal:
+  - 4 fingers:  over 0dBm ![4 fingers](app/src/main/res/drawable-mdpi/ic_four_fingers.png)
+  - 3 fingers:   -5 to 0dBm ![3 fingers](app/src/main/res/drawable-mdpi/ic_three_fingers.png)
+  - 2 fingers:  -10 to -5dBm ![2 fingers](app/src/main/res/drawable-mdpi/ic_two_fingers.png)
+  - 1 fingers:  -15 to -10dBm ![1 finger](app/src/main/res/drawable-mdpi/ic_one_finger.png)
+  - fist: less than -15dBm ![fist](app/src/main/res/drawable-mdpi/ic_clenched_fist.png)
+
+On the Details screen, the transmitter and receiver locations are identified by these icons:
+  - Transmitter: ![main screen](screenshots/wsprnetViewerTxSymbol.png)
+  - Receiver: ![main screen](screenshots/wsprnetViewerRxSymbol.png)
+
 #### About the "Maidenhead Locator System"
 Transmitter and receiver locations are reported and stored in the [Maidenhead Locator System](http://en.wikipedia.org/wiki/Maidenhead_Locator_System), a shorthand method of writing GPS coordinates using a combination of four or six numbers and letters.  Keeping the number of characters to transmit to a minimum is important when using low-speed communications such as Morse code, voice, or the WSPR protocol (which takes 110.6 seconds to transmit 50 bits or 1.5 bauds.)  Six characters identifies a longitude/latitude "grid square" of about 3 x 4 miles, which is sufficient resolution for propagation reports.  WsprNet Viewer displays the Maidenhead notation, but decodes it into longitude and latitude when marking locations on a map.
 
