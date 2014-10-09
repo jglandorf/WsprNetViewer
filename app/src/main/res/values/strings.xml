@@ -231,5 +231,5 @@
     </string>
     <!-- SyncAdapter related -->
     <string name="sync_account_type">wsprnetviewer.joe.glandorf1.com</string>
-    <string name="content_authority">"com.glandorf1.joe.wsprnetviewer.app"</string>
+    <string name="content_authority">"com.mentisavis.wsprnetviewer.app"</string>
 </resources>

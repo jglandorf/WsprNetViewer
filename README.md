@@ -16,7 +16,7 @@ WsprNet Viewer is an Android application that periodically retrieves and display
 How well a radio signal travels ("propagates") is affected by its frequency (e.g., shortwave, VHF, UHF, microwave), distance, path, terrain, and atmospheric conditions between transmitter and receiver.  Radio waves tend to travel in straight lines.  For distances beyond the horizon (over ~20 miles), we might rely on them repeatedly bouncing between the ionosphere or other atmospheric phenomena, "hopping" along to a receiver.  Some aspects of this category of propagation are cyclical (as the sun rises and sets, or per 11-year sunspot cycles), but many are not so predictable and can vary in as little as a few minutes.
 
 It's useful to have an idea of current propagation conditions at various radio frequencies for points around the globe.  A network of amateur radio beacons and receivers exists that continuously track radio propagation; this information is reported to a central website at http://wsprnet.org. 
- 
+
 #### About the Icons
   WSPR receivers include the signal strength in their reports; this is equivalent to the "number of bars" displayed on a phone to indicate cell tower or WiFi signal strength.  To avoid confusion with these icons, WsprNet Viewer uses a hand holding up one to four fingers to indicate a good to poor signal; a clenched fist indicates a very poor signal:
   - 4 fingers:  over 0dBm
@@ -39,7 +39,7 @@ Transmitter and receiver locations are reported and stored in the [Maidenhead Lo
        - `app/installReleaseToDevice.bat` to install the Release version.
 
 ### Dependencies ###
-This project uses the [jsoup](http://jsoup.org) HTML parsing library, which been added as a dependency to `../app/build.gradle`. Android Studio will automatically retrieve it from Maven.
+This project uses the [jsoup](http://jsoup.org) HTML parsing library, which been added as a dependency to `app/build.gradle`. Android Studio will automatically retrieve it from Maven.
 
 
 ### Testing and Development

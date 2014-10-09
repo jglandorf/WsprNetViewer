@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.glandorf1.joe.wsprnetviewer.app;
+package com.mentisavis.wsprnetviewer.app;
 
 
 import android.annotation.TargetApi;
@@ -26,7 +26,7 @@ import android.os.Build;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.glandorf1.joe.wsprnetviewer.app.data.WsprNetContract;
+import com.mentisavis.wsprnetviewer.app.data.WsprNetContract;
 
 // now replacing below with 4.32
 public class TestProvider extends AndroidTestCase {
@@ -164,33 +164,33 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void testGetType() {
-        // content://com.glandorf1.joe.wsprnetviewer.app/wspr/
+        // content://com.mentisavis.wsprnetviewer.app/wspr/
         String type = mContext.getContentResolver().getType(WsprNetContract.SignalReportEntry.CONTENT_URI);
-        // vnd.android.cursor.dir/com.glandorf1.joe.wsprnetviewer.app/wspr
+        // vnd.android.cursor.dir/com.mentisavis.wsprnetviewer.app/wspr
         assertEquals(WsprNetContract.SignalReportEntry.CONTENT_TYPE, type);
 
         String testGridsquare = "94074";
-        // content://com.glandorf1.joe.wsprnetviewer.app/wspr/94074
+        // content://com.mentisavis.wsprnetviewer.app/wspr/94074
         type = mContext.getContentResolver().getType(
                 WsprNetContract.SignalReportEntry.buildWsprGridsquare(testGridsquare));
-        // vnd.android.cursor.dir/com.glandorf1.joe.wsprnetviewer.app/wspr
+        // vnd.android.cursor.dir/com.mentisavis.wsprnetviewer.app/wspr
         assertEquals(WsprNetContract.SignalReportEntry.CONTENT_TYPE, type);
 
         String testTimestamp = "20140612";
-        // content://com.glandorf1.joe.wsprnetviewer.app/wspr/94074/20140612
+        // content://com.mentisavis.wsprnetviewer.app/wspr/94074/20140612
         type = mContext.getContentResolver().getType(
                 WsprNetContract.SignalReportEntry.buildWsprGridsquareWithTimestamp(testGridsquare, testTimestamp));
-        // vnd.android.cursor.item/com.glandorf1.joe.wsprnetviewer.app/wspr
+        // vnd.android.cursor.item/com.mentisavis.wsprnetviewer.app/wspr
         assertEquals(WsprNetContract.SignalReportEntry.CONTENT_ITEM_TYPE, type);
 
-        // content://com.glandorf1.joe.wsprnetviewer.app/gridsquare/
+        // content://com.mentisavis.wsprnetviewer.app/gridsquare/
         type = mContext.getContentResolver().getType(WsprNetContract.GridSquareEntry.CONTENT_URI);
-        // vnd.android.cursor.dir/com.glandorf1.joe.wsprnetviewer.app/gridsquare
+        // vnd.android.cursor.dir/com.mentisavis.wsprnetviewer.app/gridsquare
         assertEquals(WsprNetContract.GridSquareEntry.CONTENT_TYPE, type);
 
-        // content://com.glandorf1.joe.wsprnetviewer.app/gridsquare/1
+        // content://com.mentisavis.wsprnetviewer.app/gridsquare/1
         type = mContext.getContentResolver().getType(WsprNetContract.GridSquareEntry.buildGridsquareUri(1L));
-        // vnd.android.cursor.item/com.glandorf1.joe.wsprnetviewer.app/gridsquare
+        // vnd.android.cursor.item/com.mentisavis.wsprnetviewer.app/gridsquare
         assertEquals(WsprNetContract.GridSquareEntry.CONTENT_ITEM_TYPE, type);
     }
 

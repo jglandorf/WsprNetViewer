@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="white">#FFFFFF</color>
-    <color name="grey">#cccccc</color>
-    <color name="grey_700">#646464</color>
-    <color name="black">#000000</color>
+    <color name="white">#FFFFFF</color>    <!-- 255 255 255 -->
+    <color name="grey">#cccccc</color>     <!-- 204 204 204 -->
+    <color name="grey_700">#646464</color> <!-- 100 100 100 -->
+    <color name="black">#000000</color>    <!--   0   0   0 -->
 
-    <color name="wspr_light_blue">#ff64c2f4</color>
-    <color name="wspr_blue">#ff1ca8f4</color>
-    <color name="wspr_red">#ffff2828</color>
-    <color name="wspr_orange">#ffff8000</color>
-    <color name="wspr_yellow">#ffffff00</color>
-    <color name="wspr_violet">#ffA800A8</color>
+    <color name="wspr_light_blue">#ff64c2f4</color> <!-- 100 194 244 -->
+    <color name="wspr_blue">#ff1ca8f4</color>       <!--  28 168 244 -->
+    <color name="wspr_red">#ffff2828</color>        <!-- 242  40  40 -->
+    <color name="wspr_orange">#ffff8000</color>     <!-- 255 128   0 -->
+    <color name="wspr_yellow">#ffffff00</color>     <!-- 255 255   0 -->
+    <color name="wspr_violet">#ffA800A8</color>     <!-- 250   0 250 -->
 
 </resources>
