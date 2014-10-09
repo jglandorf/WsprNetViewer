@@ -1,8 +1,8 @@
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_wspr"
-    android:name="com.mentisavis.wsprnetviewer.app.WsprFragment"
+    android:name="com.glandorf1.joe.wsprnetviewer.app.WsprFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mentisavis.wsprnetviewer.app.WsprFragment"
+    tools:context="com.glandorf1.joe.wsprnetviewer.app.WsprFragment"
     tools:layout="@android:/layout/list_content" />

@@ -418,9 +418,9 @@
             android:layout_gravity="center"
             android:layout_weight="2">
 
-            <!-- alternatively, use com.mentisavis.wsprnetviewer.app.data.WsprNetCustomView -->
+            <!-- alternatively, use com.glandorf1.joe.wsprnetviewer.app.data.WsprNetCustomView -->
             <!-- or ImageView -->
-            <com.mentisavis.wsprnetviewer.app.data.WsprNetCustomView
+            <com.glandorf1.joe.wsprnetviewer.app.data.WsprNetCustomView
                 android:id="@+id/detail_map"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

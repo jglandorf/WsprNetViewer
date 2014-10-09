@@ -3,5 +3,5 @@
     android:id="@+id/wspr_detail_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.mentisavis.wsprnetviewer.app.DetailActivity"
+    tools:context="com.glandorf1.joe.wsprnetviewer.app.DetailActivity"
     tools:ignore="MergeRootFrame" />

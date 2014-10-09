@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mentisavis.wsprnetviewer.app;
+package com.glandorf1.joe.wsprnetviewer.app;
 
 
 import android.content.ContentValues;
@@ -23,8 +23,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.mentisavis.wsprnetviewer.app.data.WsprNetContract;
-import com.mentisavis.wsprnetviewer.app.data.WsprNetDbHelper;
+import com.glandorf1.joe.wsprnetviewer.app.data.WsprNetContract;
+import com.glandorf1.joe.wsprnetviewer.app.data.WsprNetDbHelper;
 
 import java.text.DecimalFormat;
 import java.util.Map;

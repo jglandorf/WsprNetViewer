@@ -7,11 +7,11 @@ android {
     compileSdkVersion 19
     buildToolsVersion "20.0.0"
     defaultConfig {
-        applicationId "com.mentisavis.wsprnetviewer.app"
+        applicationId "com.glandorf1.joe.wsprnetviewer.app"
         minSdkVersion 10
         targetSdkVersion 19
-        versionCode 1
-        versionName "1.0"
+        versionCode 2
+        versionName "0.11"
     }
     buildTypes {
         release {

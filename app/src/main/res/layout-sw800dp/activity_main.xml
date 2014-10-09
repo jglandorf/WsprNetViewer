@@ -5,13 +5,13 @@
     android:baselineAligned="false"
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
-    tools:context="com.mentisavis.wsprnetviewer.app.MainActivity">
+    tools:context="com.glandorf1.joe.wsprnetviewer.app.MainActivity">
 
     <!-- Two-pane layout- main WSPR list and further information for one item.  -->
 
     <fragment
         android:id="@+id/fragment_wspr"
-        android:name="com.mentisavis.wsprnetviewer.app.WsprFragment"
+        android:name="com.glandorf1.joe.wsprnetviewer.app.WsprFragment"
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="2"

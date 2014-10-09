@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.mentisavis.wsprnetviewer.app;
+package com.glandorf1.joe.wsprnetviewer.app;
 
 
 import android.test.suitebuilder.TestSuiteBuilder;
