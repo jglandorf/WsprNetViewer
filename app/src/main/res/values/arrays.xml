@@ -75,6 +75,7 @@
         <item>@string/pref_band_label_MF</item>
         <item>@string/pref_band_label_160m</item>
         <item>@string/pref_band_label_80m</item>
+        <item>@string/pref_band_label_60m</item>
         <item>@string/pref_band_label_40m</item>
         <item>@string/pref_band_label_30m</item>
         <item>@string/pref_band_label_20m</item>
@@ -93,6 +94,7 @@
         <item>@string/pref_band_value_MF</item>
         <item>@string/pref_band_value_160m</item>
         <item>@string/pref_band_value_80m</item>
+        <item>@string/pref_band_value_60m</item>
         <item>@string/pref_band_value_40m</item>
         <item>@string/pref_band_value_30m</item>
         <item>@string/pref_band_value_20m</item>
