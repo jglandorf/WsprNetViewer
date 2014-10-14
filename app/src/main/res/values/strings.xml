@@ -12,6 +12,9 @@
         radio signal propagation reports from wsprnet.org.  Tapping on a report displays more information about it,
         along with a world map identifying the transmitter and receiver locations.
         \u000aCarrier message and data rates may apply.
+        \u000aNotes:
+        \u000a  In the \'Filters\' settings, you can use the wildcards \'\u003f\' (any one character) and \'\u002a\' (any characters), or any letter (upper or lower case), number, or \'/\' (stroke).
+        \u000a  For example, a TX callsign filter of d\u003f3\u002a displays only reports with a TX callsign starting with \'D\', followed by any character, then a \'3\', followed by any characters.
         \u000a73 de Joe, AC8ES.
     </string>
     <string name="app_credits">Uses:\u000a icons8 icons8.com/license \u000a jsoup  jsoup.org \u000a map image http://en.wikipedia.org/wiki/Maidenhead_Locator_System
@@ -117,6 +120,26 @@
     <string name="pref_band_value_70cm">432</string>
     <string name="pref_band_value_23cm">1270</string>
 
+    <!-- filtering strings -->
+      <!-- labels -->
+    <string name="pref_filters_label">Filters</string>
+    <string name="pref_filters_wildcards">Filters: wildcards=\?\*</string>
+    <string name="pref_filter_label_tx_callsign">TX callsign</string>
+    <string name="pref_filter_label_rx_callsign">RX callsign</string>
+    <string name="pref_filter_label_tx_gridsquare">TX gridsquare</string>
+    <string name="pref_filter_label_rx_gridsquare">RX gridsquare</string>
+    <!-- summary -->
+    <string name="pref_filter_summary_tx_callsign">show only this TX callsign</string>
+    <string name="pref_filter_summary_rx_callsign">show only this RX callsign</string>
+    <string name="pref_filter_summary_tx_gridsquare">show only this TX gridsquare</string>
+    <string name="pref_filter_summary_rx_gridsquare">show only this RX gridsquare</string>
+      <!-- keys -->
+    <string name="pref_filters_key" translatable="false">filters_key</string>
+    <string name="pref_filter_key_tx_callsign" translatable="false">pref_filter_key_tx_callsign</string>
+    <string name="pref_filter_key_rx_callsign" translatable="false">pref_filter_key_rx_callsign</string>
+    <string name="pref_filter_key_tx_gridsquare" translatable="false">pref_filter_key_tx_gridsquare</string>
+    <string name="pref_filter_key_rx_gridsquare" translatable="false">pref_filter_key_rx_gridsquare</string>
+
     <!-- wsprnet.org/olddb permits queries -->
     <string name="url_wsprnet_spots_old_base" formatted="false">http://wsprnet.org/olddb</string>
     <string name="url_wsprnet_spots_old" formatted="false">http://wsprnet.org/olddb?mode=html\u0026band=all\u0026limit=500\u0026findcall=\u0026findreporter=\u0026sort=date</string>
@@ -134,8 +157,12 @@
     <!-- 'Empty' web page; this is the default data if the live website access fails. -->
     <string name="html_empty_page">%20%20%20%20%20%20%20%20%3C%21%44%4F%43%54%59%50%45%20%68%74%6D%6C%20%50%55%42%4C%49%43%20%22%2D%2F%2F%57%33%43%2F%2F%44%54%44%20%58%48%54%4D%4C%2B%52%44%46%61%20%31%2E%30%2F%2F%45%4E%22%20%20%22%68%74%74%70%3A%2F%2F%77%77%77%2E%77%33%2E%6F%72%67%2F%4D%61%72%6B%55%70%2F%44%54%44%2F%78%68%74%6D%6C%2D%72%64%66%61%2D%31%2E%64%74%64%22%3E%0D%0A%20%20%20%20%20%20%20%20%3C%68%74%6D%6C%20%78%6D%6C%6E%73%3D%22%68%74%74%70%3A%2F%2F%77%77%77%2E%77%33%2E%6F%72%67%2F%31%39%39%39%2F%78%68%74%6D%6C%22%20%78%6D%6C%3A%6C%61%6E%67%3D%22%65%6E%22%20%76%65%72%73%69%6F%6E%3D%22%58%48%54%4D%4C%2B%52%44%46%61%20%31%2E%30%22%20%64%69%72%3D%22%6C%74%72%22%3E%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%62%6F%64%79%3E%20%20%3C%2F%62%6F%64%79%3E%0D%0A%20%20%20%20%20%20%20%20%3C%2F%68%74%6D%6C%3E</string>
 
-    <!-- Strings for formatting wspr-related data -->
+    <!-- Main ListView-related -->
+    <string name="toast_num_items"><xliff:g id="num">%1d</xliff:g> items</string>
+    <string name="toast_no_items">There are no items to display!</string>
+    <string name="toast_filter_items">Retrieving filtered items.</string>
 
+    <!-- Strings for formatting wspr-related data -->
     <!-- Label for the units preference [CHAR LIMIT=30] -->
     <string name="pref_units_label">Units</string>
     <!-- Label for metric option in unit preference [CHAR LIMIT=25] -->
