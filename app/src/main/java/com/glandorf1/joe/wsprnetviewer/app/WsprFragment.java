@@ -48,6 +48,7 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
     private WsprAdapter mWsprAdapter;
     private static final int WSPR_LOADER = 0;
     private String mSelection, mGridsquare, mFilterTxCallsign, mFilterRxCallsign, mFilterTxGridsquare, mFilterRxGridsquare;
+    private boolean mFilterAnd, mFiltered;
     private int mLastNumItems = -1;
     private ListView mListView;
     private int mPosition = ListView.INVALID_POSITION;  // selected item's position
@@ -199,14 +200,19 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
     @Override
     public void onResume() {
         super.onResume();
+        boolean filterOn = Utility.isFiltered(getActivity());
         // TODO: use some other criterion for restarting the loader
 //        if (mGridsquare != null && !mGridsquare.equals(Utility.getPreferredGridsquare(getActivity()))) {
 //            getLoaderManager().restartLoader(WSPR_LOADER, null, this);
 //        }
-        if (   (mFilterTxCallsign != null && !mFilterTxCallsign.equals((Utility.getFilterCallsign(getActivity(),  true))))
-            || (mFilterRxCallsign != null && !mFilterRxCallsign.equals((Utility.getFilterCallsign(getActivity(), false))))
-            || (mFilterTxGridsquare != null && !mFilterTxGridsquare.equals((Utility.getFilterGridsquare(getActivity(), true))))
-            || (mFilterRxGridsquare != null && !mFilterRxGridsquare.equals((Utility.getFilterGridsquare(getActivity(), false))))
+        if (filterOn // and filter settings have changed
+                    && (   ((mFilterTxCallsign   != null) && !mFilterTxCallsign.equals((Utility.getFilterCallsign(getActivity(),  true))))
+                        || ((mFilterRxCallsign   != null) && !mFilterRxCallsign.equals((Utility.getFilterCallsign(getActivity(), false))))
+                        || ((mFilterTxGridsquare != null) && !mFilterTxGridsquare.equals((Utility.getFilterGridsquare(getActivity(), true))))
+                        || ((mFilterRxGridsquare != null) && !mFilterRxGridsquare.equals((Utility.getFilterGridsquare(getActivity(), false))))
+                        || (mFilterAnd != Utility.isFilterAnd(getActivity()))
+                       )
+            || (mFiltered != Utility.isFiltered(getActivity())) // or filter on/off has changed
            ) {
             mLastNumItems = -1; // reset so that notification will appear
             getLoaderManager().restartLoader(WSPR_LOADER, null, this);
@@ -229,7 +235,6 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
         // Sort order:  Descending, by timestamp.
         String sortOrder = WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " DESC";
-        String sAnd = " ";
         String txCall = Utility.getFilterCallsign(getActivity(), true),
                rxCall = Utility.getFilterCallsign(getActivity(), false);
         String txGridsquare = Utility.getFilterGridsquare(getActivity(),  true),
@@ -239,28 +244,34 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
         txGridsquare = Utility.filterCleanup(txGridsquare);
         rxGridsquare = Utility.filterCleanup(rxGridsquare);
         mSelection = "";
-        if (txCall.length() > 0) {
-            sAnd = (mSelection.length() > 0)? " and " : "";
-            mSelection += sAnd + WsprNetContract.SignalReportEntry.COLUMN_TX_CALLSIGN + " like '" + txCall + "'";
-        }
-        if (rxCall.length() > 0) {
-            sAnd = (mSelection.length() > 0)? " and " : "";
-            mSelection += sAnd + WsprNetContract.SignalReportEntry.COLUMN_RX_CALLSIGN + " like '" + rxCall + "'";
-        }
-        if (txGridsquare.length() > 0) {
-            sAnd = (mSelection.length() > 0)? " and " : "";
-            mSelection += sAnd + WsprNetContract.SignalReportEntry.COLUMN_TX_GRIDSQUARE + " like '" + txGridsquare + "'";
-        }
-        if (rxGridsquare.length() > 0) {
-            sAnd = (mSelection.length() > 0)? " and " : "";
-            mSelection += sAnd + WsprNetContract.SignalReportEntry.COLUMN_RX_GRIDSQUARE + " like '" + rxGridsquare + "'";
-        }
-        // Examples of resulting 'selection' clause:
-        //   tx_callsign like 'D%'
-        //   tx_gridsquare like 'D%' and rx_callsign like 'N%'
-        if (mSelection.length() > 0) {
-            // Remind user that items are filtered, in case the result is not what they expect.
-            Toast.makeText(getActivity(), getActivity().getString(R.string.toast_filter_items), Toast.LENGTH_LONG).show();
+        if (Utility.isFiltered(getActivity())) {
+            // When adding filters, be sure to update onResume(), and save the preference value below, too.
+            String prefAndOr = Utility.isFilterAnd(getActivity()) ? " and " : " or ";
+            String sAndOr = " ";
+            if (txCall.length() > 0) {
+                sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+                mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_TX_CALLSIGN + " like '" + txCall + "')";
+            }
+            if (rxCall.length() > 0) {
+                sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+                mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_RX_CALLSIGN + " like '" + rxCall + "')";
+            }
+            if (txGridsquare.length() > 0) {
+                sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+                mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_TX_GRIDSQUARE + " like '" + txGridsquare + "')";
+            }
+            if (rxGridsquare.length() > 0) {
+                sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+                mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_RX_GRIDSQUARE + " like '" + rxGridsquare + "')";
+            }
+            // Examples of resulting 'selection' clause:
+            //   tx_callsign like 'D%'
+            //   (tx_gridsquare like 'D%') and (rx_callsign like 'N%')
+            //   (tx_gridsquare like 'D%') or (rx_callsign like 'N%')
+            if (mSelection.length() > 0) {
+                // Remind user that items are filtered, in case the result is not what they expect.
+                Toast.makeText(getActivity(), getActivity().getString(R.string.toast_filter_items), Toast.LENGTH_LONG).show();
+            }
         }
 
         // Save some of the preferences to detect if they've changed in onResume().
@@ -269,6 +280,8 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
         mFilterRxCallsign = Utility.getFilterCallsign(getActivity(), false);
         mFilterTxGridsquare = Utility.getFilterGridsquare(getActivity(), true);
         mFilterRxGridsquare = Utility.getFilterGridsquare(getActivity(), false);
+        mFilterAnd = Utility.isFilterAnd(getActivity());
+        mFiltered = Utility.isFiltered(getActivity());
         Uri wsprUri;
         wsprUri = WsprNetContract.SignalReportEntry.buildWspr();
 

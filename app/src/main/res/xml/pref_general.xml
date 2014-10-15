@@ -51,6 +51,20 @@
         android:title="@string/pref_filters_label"
         android:key="@string/pref_filters_key" >
 
+        <CheckBoxPreference
+            android:title="@string/pref_filter_enable_label"
+            android:key="@string/pref_filter_enable_key"
+            android:summaryOff="@string/pref_filter_enable_false"
+            android:summaryOn="@string/pref_filter_enable_true"
+            android:defaultValue="@string/pref_filter_enable_default" />
+
+        <CheckBoxPreference
+            android:title="@string/pref_filter_label_match_all"
+            android:key="@string/pref_filter_key_match_all"
+            android:summaryOff="@string/pref_filter_match_all_false"
+            android:summaryOn="@string/pref_filter_match_all_true"
+            android:defaultValue="@string/pref_filter_match_all_default" />
+
         <EditTextPreference
             android:title="@string/pref_filter_label_tx_callsign"
             android:key="@string/pref_filter_key_tx_callsign"

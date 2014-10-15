@@ -220,6 +220,24 @@ public class Utility {
 
 
     /**
+     * Returns true if filters are enabled.
+     */
+    public static boolean isFiltered(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.pref_filter_enable_key),
+                Boolean.parseBoolean(context.getString(R.string.pref_filter_enable_default)));
+    }
+
+    /**
+     * Returns true if filters are to be ANDed, instead of OR'd.
+     */
+    public static boolean isFilterAnd(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getBoolean(context.getString(R.string.pref_filter_key_match_all),
+                                Boolean.parseBoolean(context.getString(R.string.pref_filter_match_all_default)));
+    }
+
+    /**
      * Returns the TX or RX callsign filter from the preferences, or empty string if not set.
      * @param context
      * @param isTx

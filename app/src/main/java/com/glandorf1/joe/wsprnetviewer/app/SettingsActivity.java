@@ -74,6 +74,8 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_band_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_recent_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_update_interval_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_enable_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_match_all)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_tx_callsign)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_rx_callsign)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_tx_gridsquare)));

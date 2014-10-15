@@ -123,22 +123,34 @@
     <!-- filtering strings -->
       <!-- labels -->
     <string name="pref_filters_label">Filters</string>
+    <string name="pref_filter_enable_label">Filter</string>
     <string name="pref_filters_wildcards">Filters: wildcards=\?\*</string>
+    <string name="pref_filter_label_match_all">Match all</string>
     <string name="pref_filter_label_tx_callsign">TX callsign</string>
     <string name="pref_filter_label_rx_callsign">RX callsign</string>
     <string name="pref_filter_label_tx_gridsquare">TX gridsquare</string>
     <string name="pref_filter_label_rx_gridsquare">RX gridsquare</string>
     <!-- summary -->
+    <string name="pref_filter_summary_match_all">and/or</string>
     <string name="pref_filter_summary_tx_callsign">show only this TX callsign</string>
     <string name="pref_filter_summary_rx_callsign">show only this RX callsign</string>
     <string name="pref_filter_summary_tx_gridsquare">show only this TX gridsquare</string>
     <string name="pref_filter_summary_rx_gridsquare">show only this RX gridsquare</string>
       <!-- keys -->
     <string name="pref_filters_key" translatable="false">filters_key</string>
+    <string name="pref_filter_enable_key" translatable="false">enable_filter_key</string>
+    <string name="pref_filter_key_match_all">pref_filter_key_match_all</string>
     <string name="pref_filter_key_tx_callsign" translatable="false">pref_filter_key_tx_callsign</string>
     <string name="pref_filter_key_rx_callsign" translatable="false">pref_filter_key_rx_callsign</string>
     <string name="pref_filter_key_tx_gridsquare" translatable="false">pref_filter_key_tx_gridsquare</string>
     <string name="pref_filter_key_rx_gridsquare" translatable="false">pref_filter_key_rx_gridsquare</string>
+      <!-- values -->
+    <string name="pref_filter_enable_true">Enabled</string>
+    <string name="pref_filter_enable_false">Not Enabled</string>
+    <string name="pref_filter_enable_default" translatable="false">false</string>
+    <string name="pref_filter_match_all_true">match all</string>
+    <string name="pref_filter_match_all_false">match any</string>
+    <string name="pref_filter_match_all_default" translatable="false">false</string>
 
     <!-- wsprnet.org/olddb permits queries -->
     <string name="url_wsprnet_spots_old_base" formatted="false">http://wsprnet.org/olddb</string>

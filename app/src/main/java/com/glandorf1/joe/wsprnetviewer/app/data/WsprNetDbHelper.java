@@ -78,7 +78,8 @@ public class WsprNetDbHelper extends SQLiteOpenHelper {
                 WsprNetContract.SignalReportEntry.COLUMN_TX_CALLSIGN + ", " +
                 WsprNetContract.SignalReportEntry.COLUMN_TX_GRIDSQUARE + ", " +
                 WsprNetContract.SignalReportEntry.COLUMN_RX_CALLSIGN + ", " +
-                WsprNetContract.SignalReportEntry.COLUMN_RX_GRIDSQUARE +
+                WsprNetContract.SignalReportEntry.COLUMN_RX_GRIDSQUARE + ", " +
+                WsprNetContract.SignalReportEntry.COLUMN_TX_FREQ_MHZ +
                 ") ON CONFLICT REPLACE);"
                 ;
         sqLiteDatabase.execSQL(SQL_CREATE_GRIDSQUARE_TABLE);
