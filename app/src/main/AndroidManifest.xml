@@ -13,7 +13,7 @@
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <!-- If we enable dump-to-SD-card, WRITE_EXTERNAL_STORAGE will need to be set. -->
     <!-- TODO: determine if we can check for WRITE_EXTERNAL_STORAGE permission at compile/runtime. -->
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /-->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
     <application
