@@ -16,12 +16,16 @@
 package com.glandorf1.joe.wsprnetviewer.app;
 
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,13 +35,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.glandorf1.joe.wsprnetviewer.app.data.WsprNetContract;
 import com.glandorf1.joe.wsprnetviewer.app.sync.WsprNetViewerSyncAdapter;
-
-import java.util.Calendar;
-import java.util.Date;
 
 /**
  * Encapsulates getting the wspr data and displaying it in a ListView layout.
@@ -51,6 +53,7 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
     private boolean mFilterAnd, mFiltered;
     private int mLastNumItems = -1;
     private ListView mListView;
+    private TextView mTVGridCallHeader;
     private int mPosition = ListView.INVALID_POSITION;  // selected item's position
     private boolean mDualPane; // provision for putting the details fragment next to this fragment for wider screens
 
@@ -162,6 +165,9 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        // Get a reference to the grid/call header
+        mTVGridCallHeader = (TextView) rootView.findViewById(R.id.textview_list_header_gridsquare);
+
         // Get a reference to the ListView, and attach this adapter to it.
         mListView = (ListView) rootView.findViewById(R.id.listview_wspr);
         mListView.setAdapter(mWsprAdapter);
@@ -201,10 +207,7 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
     public void onResume() {
         super.onResume();
         boolean filterOn = Utility.isFiltered(getActivity());
-        // TODO: use some other criterion for restarting the loader
-//        if (mGridsquare != null && !mGridsquare.equals(Utility.getPreferredGridsquare(getActivity()))) {
-//            getLoaderManager().restartLoader(WSPR_LOADER, null, this);
-//        }
+        // Restart the loader if some of the preferences have changed.
         if (filterOn // and filter settings have changed
                     && (   ((mFilterTxCallsign   != null) && !mFilterTxCallsign.equals((Utility.getFilterCallsign(getActivity(),  true))))
                         || ((mFilterRxCallsign   != null) && !mFilterRxCallsign.equals((Utility.getFilterCallsign(getActivity(), false))))
@@ -213,6 +216,7 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
                         || (mFilterAnd != Utility.isFilterAnd(getActivity()))
                        )
             || (mFiltered != Utility.isFiltered(getActivity())) // or filter on/off has changed
+            || (mWsprAdapter.mainDisplayFormat !=  Utility.getMainDisplayPreference(getActivity())) // or layout has changed
            ) {
             mLastNumItems = -1; // reset so that notification will appear
             getLoaderManager().restartLoader(WSPR_LOADER, null, this);
@@ -224,14 +228,12 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
         // This is called when a new Loader needs to be created.  This
         // fragment only uses one loader, so we don't care about checking the id.
 
-        // Filter the query to only return data from today and the previous N days.
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(new Date());
-        // TODO: change this to -7
-        cal.add(Calendar.DATE, -30);
-        Date cutoffDate = cal.getTime();
-
-        String startTimestamp = WsprNetContract.getDbTimestampString(cutoffDate);
+        // TODO: Filter the query to only return data from today and the previous N days.
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(new Date());
+//        cal.add(Calendar.DATE, -7); // N= 7
+//        Date cutoffDate = cal.getTime();
+//        String startTimestamp = WsprNetContract.getDbTimestampString(cutoffDate);
 
         // Sort order:  Descending, by timestamp.
         String sortOrder = WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " DESC";
@@ -274,8 +276,38 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
             }
         }
 
+        int mainDisplayPreference = Utility.getMainDisplayPreference(getActivity());
+        if (mWsprAdapter.mainDisplayFormat != mainDisplayPreference) {
+            // Update the gridsquare/callsign heading text based on the display layout.
+            switch (mainDisplayPreference) {
+                case Utility.MAIN_DISPLAY_CALLSIGN: // fit everything into 2 lines of display
+                    mTVGridCallHeader.setText(getActivity().getString(R.string.callsign));
+                    mTVGridCallHeader.setTextColor(getResources().getColor(R.color.wspr_brown));
+                    break;
+                case Utility.MAIN_DISPLAY_GRIDCALL: // fit everything into 4 lines of display
+                    String g = getActivity().getString(R.string.grid);
+                    String c = getActivity().getString(R.string.call);
+                    Spannable s = new SpannableString(g + "/" + c);
+                    // In "Grid/Call", make "grid" black, "Call" brown, and "/" somewhere between.
+                    // Release: For "Grid", set the span to be 1 extra character.
+                    s.setSpan(new ForegroundColorSpan(Color.BLACK), 0, g.length()+0, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    // Debug: For the "/", set the span to be 2 characters; it will won't display in the color if the span is only 1 character.
+                    s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.wspr_brown2)), g.length()+0, g.length()+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.wspr_brown)), g.length()+1, s.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    mTVGridCallHeader.setText(s);
+                    break;
+                case Utility.MAIN_DISPLAY_GRIDSQUARE: // fit everything into 2 lines of display
+                default:
+                    mTVGridCallHeader.setText(getActivity().getString(R.string.gridsquare));
+                    mTVGridCallHeader.setTextColor(Color.BLACK);
+            }
+
+        }
+
+
         // Save some of the preferences to detect if they've changed in onResume().
         mGridsquare = Utility.getPreferredGridsquare(getActivity());
+        mWsprAdapter.mainDisplayFormat = mainDisplayPreference;
         mFilterTxCallsign = Utility.getFilterCallsign(getActivity(), true);
         mFilterRxCallsign = Utility.getFilterCallsign(getActivity(), false);
         mFilterTxGridsquare = Utility.getFilterGridsquare(getActivity(), true);

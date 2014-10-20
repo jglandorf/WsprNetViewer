@@ -17,6 +17,13 @@
         android:entryValues="@array/pref_units_values"
         android:entries="@array/pref_units_options" />
 
+    <ListPreference
+        android:title="@string/pref_main_display_label"
+        android:key="@string/pref_main_display_key"
+        android:defaultValue="@string/pref_main_display_gridsquare"
+        android:entryValues="@array/pref_main_display_values"
+        android:entries="@array/pref_main_display_options" />
+
     <PreferenceScreen
         android:layout_width="match_parent"
         android:layout_height="match_parent"

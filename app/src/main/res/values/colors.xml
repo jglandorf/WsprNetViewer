@@ -10,6 +10,8 @@
     <color name="wspr_blue">#ff1ca8f4</color>       <!--  28 168 244 -->
     <color name="wspr_red">#ffff2828</color>        <!-- 242  40  40 -->
     <color name="wspr_orange">#ffff8000</color>     <!-- 255 128   0 -->
+    <color name="wspr_brown">#ff804000</color>      <!-- 128  64   0 -->
+    <color name="wspr_brown2">#ff504800</color>     <!--  80  48   0 -->
     <color name="wspr_yellow">#ffffff00</color>     <!-- 255 255   0 -->
     <color name="wspr_violet">#ffA800A8</color>     <!-- 250   0 250 -->
 

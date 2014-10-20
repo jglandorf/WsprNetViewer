@@ -36,6 +36,7 @@ public class WsprAdapter extends CursorAdapter {
     private static final int VIEW_TYPE_OLDER = 1;
     // Flag to determine if we want to use a separate view for "recent reports".
     private boolean mUseDualPane = false;
+    public int mainDisplayFormat = -1;
 
     /**
      * Cache of the children views for a wspr list item.
@@ -45,22 +46,32 @@ public class WsprAdapter extends CursorAdapter {
         public final TextView timestampView;
         public final TextView txgridsquareView;
         public final TextView rxgridsquareView;
-//        public final TextView txcallsignView;
-//        public final TextView rxcallsignView;
+        public final TextView txgridsquarelabelView;
+        public final TextView rxgridsquarelabelView;
+        public final TextView txcallsignView;
+        public final TextView rxcallsignView;
+        public final TextView txcallsignlabelView;
+        public final TextView rxcallsignlabelView;
         public final TextView txfreqmhzView;
         public final TextView rxsnrView;
+        public final TextView distanceView;
+        public final TextView distanceViewUnits;
 
         public ViewHolder(View view) {
             iconView = (ImageView) view.findViewById(R.id.list_item_icon);
             timestampView = (TextView) view.findViewById(R.id.list_item_timestamp_textview);
             rxgridsquareView = (TextView) view.findViewById(R.id.list_item_rxgridsquare_textview);
             txgridsquareView = (TextView) view.findViewById(R.id.list_item_txgridsquare_textview);
-//            rxcallsignView = (TextView) view.findViewById(R.id.list_item_rxcallsign_textview);
-//            txcallsignView = (TextView) view.findViewById(R.id.list_item_txcallsign_textview);
+            rxgridsquarelabelView = (TextView) view.findViewById(R.id.list_item_rxgridsquare_label_textview);
+            txgridsquarelabelView = (TextView) view.findViewById(R.id.list_item_txgridsquare_label_textview);
+            rxcallsignView = (TextView) view.findViewById(R.id.list_item_rxcallsign_textview);
+            txcallsignView = (TextView) view.findViewById(R.id.list_item_txcallsign_textview);
+            rxcallsignlabelView = (TextView) view.findViewById(R.id.list_item_rxcallsign_label_textview);
+            txcallsignlabelView = (TextView) view.findViewById(R.id.list_item_txcallsign_label_textview);
             txfreqmhzView = (TextView) view.findViewById(R.id.list_item_txfreqmhz_textview);
             rxsnrView = (TextView) view.findViewById(R.id.list_item_rxsnr_textview);
-            // TODO: implement custom view - not here, remove this
-          //txgridsquareCustomView = (WsprNetCustomView) view.findViewById(R.id.view_txgridsquare_customview);
+            distanceView = (TextView) view.findViewById(R.id.list_item_distance_textview);
+            distanceViewUnits = (TextView) view.findViewById(R.id.list_item_distance_label_textview);
         }
     }
 
@@ -89,7 +100,8 @@ public class WsprAdapter extends CursorAdapter {
         String timestampString = cursor.getString(WsprFragment.COL_WSPR_TIMESTAMP);
 
         // Read wspr condition ID from cursor
-        int viewType = getItemViewType(cursor.getPosition());
+        //int viewType = getItemViewType(cursor.getPosition());
+        int viewType = mainDisplayFormat;
         // Get wspr icon
         viewHolder.iconView.setImageResource(Utility.getIconResourceForWsprCondition(cursor.getDouble(WsprFragment.COL_WSPR_RX_SNR)));
 
@@ -102,11 +114,10 @@ public class WsprAdapter extends CursorAdapter {
         String rxgridsquare = cursor.getString(WsprFragment.COL_WSPR_RX_GRIDSQUARE);
         viewHolder.rxgridsquareView.setText(rxgridsquare);
 
-        // Not enough space in the layout for these.
-//        String txcallsign = cursor.getString(WsprFragment.COL_WSPR_TX_CALLSIGN);
-//        viewHolder.txcallsignView.setText(txcallsign);
-//        String rxcallsign = cursor.getString(WsprFragment.COL_WSPR_RX_CALLSIGN);
-//        viewHolder.rxcallsignView.setText(rxcallsign);
+        String txcallsign = cursor.getString(WsprFragment.COL_WSPR_TX_CALLSIGN);
+        viewHolder.txcallsignView.setText(txcallsign);
+        String rxcallsign = cursor.getString(WsprFragment.COL_WSPR_RX_CALLSIGN);
+        viewHolder.rxcallsignView.setText(rxcallsign);
 
         // Read user preference for metric or English units
         boolean isMetric = Utility.isMetric(context);
@@ -122,10 +133,52 @@ public class WsprAdapter extends CursorAdapter {
         // TODO: improve accessibility message for the icon
         viewHolder.iconView.setContentDescription(rxsnr + " dB");
 
-        // TODO: display distance here??
         // Read distance from cursor
         double km = cursor.getDouble(WsprFragment.COL_WSPR_DISTANCE);
-      //viewHolder.distanceView.setText(Utility.formatDistance(context, km, isMetric));
+        viewHolder.distanceView.setText(Utility.formatDistance(context, km, isMetric));
+        viewHolder.distanceViewUnits.setText(isMetric ?
+                context.getString(R.string._units_metric_distance)
+                : context.getString(R.string._units_english_distance) );
+
+        switch (viewType) {
+            case Utility.MAIN_DISPLAY_CALLSIGN: // fit everything into 2 lines of display
+                viewHolder.txgridsquareView.setVisibility(View.GONE);
+                viewHolder.rxgridsquareView.setVisibility(View.GONE);
+                viewHolder.txgridsquarelabelView.setVisibility(View.GONE);
+                viewHolder.rxgridsquarelabelView.setVisibility(View.GONE);
+                viewHolder.txcallsignView.setVisibility(View.VISIBLE);
+                viewHolder.rxcallsignView.setVisibility(View.VISIBLE);
+                viewHolder.txcallsignlabelView.setVisibility(View.VISIBLE);
+                viewHolder.rxcallsignlabelView.setVisibility(View.VISIBLE);
+                viewHolder.distanceView.setVisibility(View.GONE);
+                viewHolder.distanceViewUnits.setVisibility(View.GONE);
+                break;
+            case Utility.MAIN_DISPLAY_GRIDCALL: // fit everything into 4 lines of display
+                viewHolder.txgridsquareView.setVisibility(View.VISIBLE);
+                viewHolder.rxgridsquareView.setVisibility(View.VISIBLE);
+                viewHolder.txgridsquarelabelView.setVisibility(View.VISIBLE);
+                viewHolder.rxgridsquarelabelView.setVisibility(View.VISIBLE);
+                viewHolder.txcallsignView.setVisibility(View.VISIBLE);
+                viewHolder.rxcallsignView.setVisibility(View.VISIBLE);
+                viewHolder.txcallsignlabelView.setVisibility(View.VISIBLE);
+                viewHolder.rxcallsignlabelView.setVisibility(View.VISIBLE);
+                viewHolder.distanceView.setVisibility(View.VISIBLE);
+                viewHolder.distanceViewUnits.setVisibility(View.VISIBLE);
+                break;
+            case Utility.MAIN_DISPLAY_GRIDSQUARE: // fit everything into 2 lines of display
+            default:
+                viewHolder.txgridsquareView.setVisibility(View.VISIBLE);
+                viewHolder.rxgridsquareView.setVisibility(View.VISIBLE);
+                viewHolder.txgridsquarelabelView.setVisibility(View.VISIBLE);
+                viewHolder.rxgridsquarelabelView.setVisibility(View.VISIBLE);
+                viewHolder.txcallsignView.setVisibility(View.GONE);
+                viewHolder.rxcallsignView.setVisibility(View.GONE);
+                viewHolder.txcallsignlabelView.setVisibility(View.GONE);
+                viewHolder.rxcallsignlabelView.setVisibility(View.GONE);
+                viewHolder.distanceView.setVisibility(View.GONE);
+                viewHolder.distanceViewUnits.setVisibility(View.GONE);
+        }
+
     }
 
     //@Override

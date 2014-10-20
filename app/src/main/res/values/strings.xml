@@ -174,7 +174,23 @@
     <string name="toast_no_items">There are no items to display!</string>
     <string name="toast_filter_items">Retrieving filtered items.</string>
 
-    <!-- Strings for formatting wspr-related data -->
+    <!-- Key name for main display preference in SharedPreferences [CHAR LIMIT=NONE] -->
+    <string name="pref_main_display_key" translatable="false">main_display_key</string>
+    <!-- Label for the main display data preference [CHAR LIMIT=30] -->
+    <string name="pref_main_display_label">Main display</string>
+    <!-- Label for grid-only option in main display preference [CHAR LIMIT=25] -->
+    <string name="pref_main_display_label_grid">Gridsquare</string>
+    <!-- Label for callsign-only option in main display preference [CHAR LIMIT=25] -->
+    <string name="pref_main_display_label_callsign">Callsign</string>
+    <!-- Label for grid+callsign option in main display preference [CHAR LIMIT=25] -->
+    <string name="pref_main_display_label_grid_call">Grid+callsign</string>
+    <!-- Value in SharedPreferences for gridsquare main display option [CHAR LIMIT=NONE] -->
+    <string name="pref_main_display_gridsquare" translatable="false">1</string>
+    <!-- Value in SharedPreferences for callsign main display option [CHAR LIMIT=NONE] -->
+    <string name="pref_main_display_callsign" translatable="false">2</string>
+    <!-- Value in SharedPreferences for grid+callsign main display option [CHAR LIMIT=NONE] -->
+    <string name="pref_main_display_grid_call" translatable="false">3</string>
+
     <!-- Label for the units preference [CHAR LIMIT=30] -->
     <string name="pref_units_label">Units</string>
     <!-- Label for metric option in unit preference [CHAR LIMIT=25] -->
@@ -226,6 +242,9 @@
 
     <string name="utc" translatable="false">UTC</string>
     <string name="gridsquare">Gridsquare</string>
+    <string name="callsign">Callsign</string>
+    <string name="grid">Grid</string>
+    <string name="call">Call</string>
     <string name="wspr" translatable="false">WSPR</string>
 
     <!-- Timestamp format [CHAR LIMIT=NONE] -->

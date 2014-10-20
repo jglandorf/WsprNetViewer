@@ -3,8 +3,8 @@
        in the gradle build script.  See app/buil.gradle. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.glandorf1.joe.wsprnetviewer.app"
-    android:versionCode="5"
-    android:versionName="0.14"
+    android:versionCode="6"
+    android:versionName="0.15"
     >
 
     <uses-permission android:name="android.permission.INTERNET" />

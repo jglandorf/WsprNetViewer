@@ -11,6 +11,18 @@
         <item>@string/pref_units_english</item>
     </string-array>
 
+    <string-array name="pref_main_display_options">
+        <item>@string/pref_main_display_label_grid</item>
+        <item>@string/pref_main_display_label_callsign</item>
+        <item>@string/pref_main_display_label_grid_call</item>
+    </string-array>
+
+    <string-array name="pref_main_display_values">
+        <item>@string/pref_main_display_gridsquare</item>
+        <item>@string/pref_main_display_callsign</item>
+        <item>@string/pref_main_display_grid_call</item>
+    </string-array>
+
     <string-array name="pref_cutoff_options">
         <item>@string/pref_recent_label_24hour</item>
         <item>@string/pref_recent_label_12hour</item>

@@ -46,6 +46,7 @@ public class Utility {
     // Format used for incoming timestamps, and for friendly representation for display.
     public static final String TIMESTAMP_FORMAT_WSPR = "yyyy-MM-dd HH:mm"; // format of the timestamp data from wsprnet.org
     public static final String TIMESTAMP_FORMAT_HOURS_MINUTES = "HH:mm"; // use "EEE MMM dd" "Day Month day#": Mon Sep 1
+    public static final int MAIN_DISPLAY_GRIDSQUARE = 0x01, MAIN_DISPLAY_CALLSIGN = 0x02, MAIN_DISPLAY_GRIDCALL = 0x03;
 
 
     // Delete all database records.
@@ -186,17 +187,22 @@ public class Utility {
         lat2 = pi * lat2 / 180.;
         long1 = pi * long1 / 180.;
         long2 = pi * long2 / 180.;
+        double azimuth = 0;
 //        // See http://www.movable-type.co.uk/scripts/latlong.html
 //        //   θ = atan2( sin Δλ ⋅ cos φ2 , cos φ1 ⋅ sin φ2 − sin φ1 ⋅ cos φ2 ⋅ cos Δλ )
 //        //   φ is latitude, λ is longitude, R is earth’s radius (mean radius = 6,371km)
         // This gives the same result as above; can optionally calculate distance.
         // See http://www.codeguru.com/cpp/cpp/algorithms/article.php/c5115/Geographic-Distance-and-Azimuth-Calculations.htm
-        double deg90 = pi / 2; // 90 degrees, in radians
-        double b = Math.acos (Math.cos(deg90 - lat2) * Math.cos(deg90 - lat1) + Math.sin(deg90 - lat2) * Math.sin(deg90 - lat1) * Math.cos(long2 - long1));
-        //double d = r * b; // optionally calculate distance
-        double azimuth2 = 180. * Math.asin(Math.sin(deg90 - lat2) * Math.sin(long2 - long1) / Math.sin(b)) / pi;
-        azimuth2 = (azimuth2 + 360.) % 360.;
-        return azimuth2;
+        try {
+            double deg90 = pi / 2; // 90 degrees, in radians
+            double b = Math.acos(Math.cos(deg90 - lat2) * Math.cos(deg90 - lat1) + Math.sin(deg90 - lat2) * Math.sin(deg90 - lat1) * Math.cos(long2 - long1));
+            //double d = r * b; // optionally calculate distance
+            azimuth = 180. * Math.asin(Math.sin(deg90 - lat2) * Math.sin(long2 - long1) / Math.sin(b)) / pi;
+            azimuth = (azimuth + 360.) % 360.;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return azimuth;
     } // latLongToAzimuth()
 
     // from http://developer.android.com/guide/topics/data/data-storage.html#filesExternal
@@ -216,6 +222,16 @@ public class Utility {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Returns the enum corresponding to the main display preference.
+     */
+    public static int getMainDisplayPreference(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String sOption = prefs.getString(context.getString(R.string.pref_main_display_key),
+                context.getString(R.string.pref_main_display_gridsquare));
+        return (int)(Integer.parseInt(sOption));
     }
 
 
