@@ -1,0 +1,24 @@
+
+2014-10-24 v0.16
+Added additional notification settings and notification filtering.
+Notifications are now only applied to WSPRs with a time stamp in the update interval.
+
+2014-10-19 v0.15
+The main screen can now display grid square, callsign, or grid square+callsign.  See the Settings menu.
+Avoid azimuth NaN calculation error.
+
+2014-10-14 v0.14
+Allow filtering OR or AND, instead of only AND. Allow overall filtering to be turned on or off.
+Avoid some reports being ignored as duplicates.
+
+2014-10-14 v0.13
+Added display filtering for callsign and grid square.
+
+2014-10-10 v0.12
+Added 60m band to notification preferences list.
+
+2014-10-09 v0.11
+Minor clean up.
+
+2014-10-08 v0.10
+Initial release.
