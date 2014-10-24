@@ -76,6 +76,11 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_recent_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_update_interval_key)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_enable_key)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_tx_callsign)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_rx_callsign)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_tx_gridsquare)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_rx_gridsquare)));
+        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_min_tx_rx_distance)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_match_all)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_tx_callsign)));
         bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_rx_callsign)));
@@ -162,7 +167,24 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             }
         } else {
             // For other preferences, set the summary to the value's simple string representation.
-            preference.setSummary(stringValue);
+            if (preference.getKey().equals(getString(R.string.pref_notify_key_min_tx_rx_distance))) {
+                // TODO: Display either km or miles-- this is not the correct function to achieve this.
+                boolean metric = true; // Utility.isMetric(getBaseContext());
+                double distance = -1;
+                try {
+                    distance = (Double.parseDouble(stringValue));
+                } catch (Exception e) {
+                    distance = -1;
+                }
+                if (distance >= 0.001) { // at least 1 meter or 0.001 mile
+                    String sDist = Utility.formatDistance(getBaseContext(), distance, metric);
+                    preference.setSummary(sDist);
+                } else {
+                    preference.setSummary("");
+                }
+            } else {
+                preference.setSummary(stringValue);
+            }
         }
         return true;
     }

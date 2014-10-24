@@ -64,7 +64,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final double mBandFrequencyTolerancePercent = 5.;
     private static Double[] mBandFrequency, mBandFrequencyMin, mBandFrequencyMax;
     private static String[] mBandFrequencyStr, mBandNameStr;
-    private static int mBandNameIdx = -1, nHits = -1;
+    private static int mBandNameIdx = -1;
 
     private Context mContext;
 
@@ -209,15 +209,13 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
 
     /**
      * Determines if a frequency is in one of the bands in R.array.pref_notify_band_values.
-     * Checks if it is also in the notification band-- if it is, then set mBandNameIdx
-     * and increment the number of hits, nHits.
+     * Checks if it is also in the notification band-- if it is, then set mBandNameIdx.
      * @param context
      * @param freqMhz - a frequency in MHz as returned by a specific WSPR report
      * @param tolerancePercent - freqMhz is in the band if within +/-tolerance of the band's center frequency
-     * @return Returns -1 if not within a valid frequency band; also sets mBandNameIdx, increments nHits.
+     * @return Returns -1 if not within a valid frequency band; also sets mBandNameIdx.
      */
-    public double getFrequencyBandCheck(Context context, double freqMhz, double tolerancePercent,
-                                        double notifyBandMHzMin, double notifyBandMHzMax) {
+    public double getFrequencyBandCheck(Context context, double freqMhz, double tolerancePercent) {
         double band = -1;
         if ((mBandFrequencyStr == null) || (mBandFrequencyStr.length <= 0)) {
             Resources res = context.getResources();
@@ -241,10 +239,6 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                 for (int i = 0; i < mBandFrequency.length; i++) {
                     if ((mBandFrequencyMin[i] <= freqMhz) && (freqMhz <= mBandFrequencyMax[i])) {
                         band = mBandFrequency[i];
-                        if ((notifyBandMHzMin <= band) && (band <= notifyBandMHzMax)) {
-                            mBandNameIdx = i; // save for getFrequencyBandName()
-                            nHits++;
-                        }
                         break;
                     }
                 }
@@ -253,19 +247,41 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         return band;
     }
 
+    /**
+     * Checks if frequency is in the notification band; sets mBandNameIdx if it is.
+     * @param freqMhz - a frequency in MHz as returned by a specific WSPR report
+     * @return Returns false if not within a valid frequency band; otherwise true.
+     */
+    public boolean frequencyBandNotifyCheck(double freqMhz,
+                                        double notifyBandMHzMin, double notifyBandMHzMax) {
+        double band = -1;
+        boolean ok = false;
+        if ((mBandFrequency != null) && (mBandFrequency.length > 0)) {
+            for (int i = 0; i < mBandFrequency.length; i++) {
+                if ((mBandFrequencyMin[i] <= freqMhz) && (freqMhz <= mBandFrequencyMax[i])) {
+                    band = mBandFrequency[i];
+                    if ((notifyBandMHzMin <= band) && (band <= notifyBandMHzMax)) {
+                        mBandNameIdx = i; // save for getFrequencyBandName()
+                        ok = true;
+                    }
+                    break;
+                }
+            }
+        }
+        return ok;
+    }
+
 
     /**
      * Clean up and parse the raw timestamp from the html.
      * Since there may be multiple records with the same timestamp (the resolution is only 1 minute),
-     * add a fake millisecond offset to distinguish each of them.
+     * make sure there is a mechanism to distinguish each of them.
      */
     public String parseTimestamp(String timestampStr) {
         SimpleDateFormat timestampFormatIn = new SimpleDateFormat(Utility.TIMESTAMP_FORMAT_WSPR);
         // TODO: getting parse exceptions-but maybe only in debug mode; SDF may not be suitable for
         //       use in static modules.
         //       Investigate using something like joda-time: http://www.joda.org/joda-time/
-        // Since there may be multiple records with the same timestamp (the resolution is only 1 minute),
-        // add a fake millisecond offset to distinguish each of them.
         try {
             Date inputTimestamp = timestampFormatIn.parse(timestampStr);
             inputTimestamp.setTime(inputTimestamp.getTime()); // + millisecondOffset); // can add a fake ms value to make timestamp unique
@@ -276,6 +292,26 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
             //e.printStackTrace();
             return timestampStr;
         }
+    }
+
+    /**
+     * Converts Date class to a string representation, used for easy comparison and database lookup.
+     * @param timestamp The input timestamp
+     * @return a WSPR-format representation of the timestamp.
+     */
+    public static long getShortTimestamp(Date timestamp){
+        // Because the API returns a unix timestamp (measured in seconds),
+        // it must be converted to milliseconds in order to be converted to valid timestamp.
+        SimpleDateFormat sdf = new SimpleDateFormat(WsprNetContract.TIMESTAMP_FORMAT_DB_SHORT);
+        String s = sdf.format(timestamp);
+        long i = 0;
+        try {
+            i = Long.parseLong(s);
+        } catch (Exception e) {
+            // nothing to do
+            i = -1;
+        }
+        return i;
     }
 
 
@@ -331,10 +367,59 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         // Notification calculations
         double minSNR  = Utility.getNotifyMinSNR(context);
         double notifyBandMHz = Utility.getNotifyBand(context),
-                notifyBandMHzMin = notifyBandMHz - 0.001, notifyBandMHzMax = notifyBandMHz + 0.001;
+               notifyBandMHzMin = notifyBandMHz - 0.001, notifyBandMHzMax = notifyBandMHz + 0.001;
+        if (notifyBandMHz < 0.00001) {
+            notifyBandMHzMin = 0;
+            notifyBandMHzMax = 1e300;
+        }
         String bandName = "";
         mBandNameIdx = -1; // reset which band was found for notification
-        nHits = 0;
+        int nHits = 0, nHitsSnr = 0, nHitsBand = 0, nHitsDistance = 0, nHitsTxCall = 0, nHitsRxCall = 0, nHitsTxGrid = 0, nHitsRxGrid = 0;
+        double notifyMinTxRxKm = Utility.getNotifyTxRxKm(context);
+        // Get the tx/rx notify callsigns, but configure for wildcard matching with regex's.
+        String displayTxCallsign = Utility.getNotifyCallsign(context, true),
+               displayRxCallsign = Utility.getNotifyCallsign(context, false);
+        String displayTxGridsquare = Utility.getNotifyGridsquare(context, true),
+               displayRxGridsquare = Utility.getNotifyGridsquare(context, false);
+        String notifyTxCallsign = Utility.filterCleanupMatch(displayTxCallsign),
+                notifyRxCallsign = Utility.filterCleanupMatch(displayRxCallsign);
+        String notifyTxGridsquare = Utility.filterCleanupMatch(displayTxGridsquare),
+                notifyRxGridsquare = Utility.filterCleanupMatch(displayRxGridsquare);
+        boolean snrOk = false, bandOk = false, distanceOk = false, txCallOk = false, rxCallOk = false, txGridOk = false, rxGridOk = false;
+        boolean snrEna = true,
+                bandEna = (notifyBandMHz < 0.00001),
+                distanceEna = (notifyMinTxRxKm >= 0.001),
+                txCallEna = (notifyTxCallsign.length() > 0),
+                rxCallEna = (notifyRxCallsign.length() > 0),
+                txGridEna = (notifyTxGridsquare.length() > 0),
+                rxGridEna = (notifyRxGridsquare.length() > 0);
+
+        // Delete items older than the cutoff period specified in the settings menu.
+        // TODO: It might be easier to use System.currentTimeMillis(), which returns time in UTC.  BUT,
+        // todo: Date objects seem to work in the local time zone; wasn't able to initialize one to UTC.
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        TimeZone tz = TimeZone.getDefault();
+        int offsetUTC = tz.getOffset(cal.getTimeInMillis()) / 1000;
+        int seconds = Utility.cutoffSeconds(context);
+        cal.add(Calendar.SECOND, -offsetUTC);
+        cal.add(Calendar.SECOND, -seconds);
+        String cutoffTimestamp = WsprNetContract.getDbTimestampString(cal.getTime());
+        int d;
+        d = context.getContentResolver().delete(WsprNetContract.SignalReportEntry.CONTENT_URI,
+                WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " <= ?",
+                new String[]{cutoffTimestamp});
+        Log.v(LOG_TAG, "getWsprDataFromTags: deleted " + Integer.toString(d) + " old items.");
+
+        // Get the cutoff date for notifications.
+        cal.setTime(new Date());
+        seconds = Utility.updateIntervalSeconds(context);
+        cal.add(Calendar.SECOND, -offsetUTC);
+        cal.add(Calendar.SECOND, -seconds);
+        long cutoffNotifyTimeMin = getShortTimestamp(cal.getTime());
+        cal.add(Calendar.SECOND, 2*seconds);
+        long cutoffNotifyTimeMax = getShortTimestamp(cal.getTime());
+        long iTimestamp = 0;
 
         try {
             // TODO: get city name, lat/long from gridsquare; determine how to look this up
@@ -393,14 +478,14 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                     // Save timestamp as: "yyyyMMddHHmmssSSS"
                     timestamp = parseTimestamp(wsprTDRow.get(WSPRNET_IDX_TIMESTAMP).text()
                             .replace(Utility.NBSP, ' ').replace(" .", ".").replace(".0000", "").trim());
-                    txCallsign = wsprTDRow.get(WSPRNET_IDX_TX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim();
+                    txCallsign = wsprTDRow.get(WSPRNET_IDX_TX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
                     txFreqMhz = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_TX_FREQ_MHZ).text().replace(Utility.NBSP, ' ').trim());
                     rxSnr = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_RX_SNR).text().replace(Utility.NBSP, ' ').trim());
                     rxDrift = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_RX_DRIFT).text().replace(Utility.NBSP, ' ').trim());
-                    txGridsquare = wsprTDRow.get(WSPRNET_IDX_TX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim();
+                    txGridsquare = wsprTDRow.get(WSPRNET_IDX_TX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
                     txPower = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_TX_POWER).text().replace(Utility.NBSP, ' ').trim());
-                    rxCallsign = wsprTDRow.get(WSPRNET_IDX_RX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim();
-                    rxGridsquare = wsprTDRow.get(WSPRNET_IDX_RX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim();
+                    rxCallsign = wsprTDRow.get(WSPRNET_IDX_RX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
+                    rxGridsquare = wsprTDRow.get(WSPRNET_IDX_RX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
                     kmDistance = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_DISTANCE).text().replace(Utility.NBSP, ' ').trim());
                     azimuth = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_AZIMUTH).text().replace(Utility.NBSP, ' ').trim());
                 } else {
@@ -409,14 +494,14 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                     // Save timestamp as: "yyyyMMddHHmmssSSS"
                     timestamp = parseTimestamp(wsprTDRow.get(WSPRNET_IDX_OLDDB_TIMESTAMP).text()
                             .replace(Utility.NBSP, ' ').replace(" .", ".").replace(".0000", "").trim());
-                    txCallsign = wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim();
+                    txCallsign = wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
                     txFreqMhz = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_FREQ_MHZ).text().replace(Utility.NBSP, ' ').trim());
                     rxSnr = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_SNR).text().replace(Utility.NBSP, ' ').trim());
                     rxDrift = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_DRIFT).text().replace(Utility.NBSP, ' ').trim());
-                    txGridsquare = wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim();
+                    txGridsquare = wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
                     txPower = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_POWER_DBM).text().replace(Utility.NBSP, ' ').trim());
-                    rxCallsign = wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim();
-                    rxGridsquare = wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim();
+                    rxCallsign = wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
+                    rxGridsquare = wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
                     kmDistance = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_DISTANCE_KM).text().replace(Utility.NBSP, ' ').trim());
                   //miDistance = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_DISTANCE_MILES).text().replace(Utility.NBSP, ' ').trim());
                     // azimuth not provided; must calculate it ourselves
@@ -447,11 +532,33 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                 //         a specific frequency band has opened up,
                 //         maybe to a particular region,
                 //         maybe some minimum number of reports at a minimum SNR.
-                if (rxSnr >= minSNR) {
-                    // getFrequencyBandCheck() will check what band the TX frequency is in, and if
-                    // it is in the notification band.
-                    double bandMHz = getFrequencyBandCheck(context, txFreqMhz, mBandFrequencyTolerancePercent,
-                            notifyBandMHzMin, notifyBandMHzMax);
+                try {
+                    iTimestamp = Long.parseLong(timestamp.substring(0, WsprNetContract.TIMESTAMP_FORMAT_DB_SHORT.length()));
+                    if (   (cutoffNotifyTimeMin > 0) && (cutoffNotifyTimeMax > 0)
+                        && (cutoffNotifyTimeMin <= iTimestamp) && (iTimestamp < cutoffNotifyTimeMax)) {
+                        // getFrequencyBandCheck() will check what band the TX frequency is in.
+                        // frequencyBandNotifyCheck will check if it is in the notification band.
+                        double bandMHz = getFrequencyBandCheck(context, txFreqMhz, mBandFrequencyTolerancePercent);
+                        bandOk = !bandEna || frequencyBandNotifyCheck(bandMHz, notifyBandMHzMin, notifyBandMHzMax);
+                        snrOk = !snrEna || (rxSnr >= minSNR);
+                        distanceOk = !distanceEna || (kmDistance >= notifyMinTxRxKm);
+                        txCallOk = !txCallEna || txCallsign.matches(notifyTxCallsign);
+                        rxCallOk = !rxCallEna || rxCallsign.matches(notifyRxCallsign);
+                        txGridOk = !txGridEna || txGridsquare.toUpperCase().matches(notifyTxGridsquare);
+                        rxGridOk = !rxGridEna || rxGridsquare.toUpperCase().matches(notifyRxGridsquare);
+                        if (bandOk && snrOk && distanceOk && txCallOk && rxCallOk && txGridOk && rxGridOk) {
+                            nHits++;
+                            nHitsBand += (bandEna && bandOk) ? 1 : 0;
+                            nHitsSnr += (snrEna && snrOk) ? 1 : 0;
+                            nHitsDistance += (distanceEna && distanceOk) ? 1 : 0;
+                            nHitsTxCall += (txCallEna && txCallOk) ? 1 : 0;
+                            nHitsRxCall += (rxCallEna && rxCallOk) ? 1 : 0;
+                            nHitsTxGrid += (txGridEna && txGridEna) ? 1 : 0;
+                            nHitsRxGrid += (rxGridEna && rxGridEna) ? 1 : 0;
+                        }
+                    }
+                } catch (Exception e) {
+                  // nothing to do
                 }
             } // parse html tags
 
@@ -465,34 +572,39 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Remove items with an unreasonable timestamp (>24 hours from now); otherwise, they're displayed forever!
             // TODO: don't insert these in the first place!
-            Calendar cal = Calendar.getInstance();
             cal.setTime(new Date());
             cal.add(Calendar.HOUR, 24);
             String tomorrowTimestamp = WsprNetContract.getDbTimestampString(cal.getTime());
-            int d = context.getContentResolver().delete(WsprNetContract.SignalReportEntry.CONTENT_URI,
-                    WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " > ?",
-                    new String[]{tomorrowTimestamp});
-            Log.v(LOG_TAG, "getWsprDataFromTags: deleted " + Integer.toString(d) + " invalid items.");
-
-            // Delete items older than the cutoff period specified in the settings menu.
-            // TODO: It might be easier to use System.currentTimeMillis(), which returns time in UTC.  BUT,
-            // todo: Date obejcts seem to work in the local time zone; wasn't able to initialize one to UTC.
-            cal.setTime(new Date());
-            TimeZone tz = TimeZone.getDefault();
-            int offsetUTC = tz.getOffset(cal.getTimeInMillis()) / 1000;
-            int seconds = Utility.cutoffSeconds(context);
-            cal.add(Calendar.SECOND, -offsetUTC);
-            cal.add(Calendar.SECOND, -seconds);
-            String cutoffTimestamp = WsprNetContract.getDbTimestampString(cal.getTime());
             d = context.getContentResolver().delete(WsprNetContract.SignalReportEntry.CONTENT_URI,
-                    WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " <= ?",
-                    new String[]{cutoffTimestamp});
-            Log.v(LOG_TAG, "getWsprDataFromTags: deleted " + Integer.toString(d) + " old items.");
+                  WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " > ?",
+                  new String[]{tomorrowTimestamp});
+            Log.v(LOG_TAG, "getWsprDataFromTags: deleted " + Integer.toString(d) + " invalid items.");
 
             // Did any reports meet the notification criteria?
             if (nHits > 0) {
-                bandName = getFrequencyBandName(context, mBandNameIdx);
-                String description = context.getString(R.string.band_open);
+                String description = "";
+                if (notifyBandMHz < 0.00001) {
+                    bandName = "---";
+                } else {
+                    bandName = getFrequencyBandName(context, mBandNameIdx);
+                    //description += context.getString(R.string.band_open) + ":";
+                }
+                if (nHitsTxCall > 0) {
+                    description += " " + context.getString(R.string.pref_filter_label_tx_callsign) + "=" + displayTxCallsign + ";";
+                }
+                if (nHitsRxCall > 0) {
+                    description += " " + context.getString(R.string.pref_filter_label_rx_callsign) + "=" + displayRxCallsign + ";";
+                }
+                if (nHitsTxGrid > 0) {
+                    description += " " + context.getString(R.string.pref_filter_label_tx_gridsquare) + "=" + displayTxGridsquare + ";";
+                }
+                if (nHitsRxGrid > 0) {
+                    description += " " + context.getString(R.string.pref_filter_label_rx_gridsquare) + "=" + displayRxGridsquare + ";";
+                }
+                if (nHitsDistance > 0) {
+                    // TODO: Display either km or miles.  See SettingsActivity.java, onPreferenceChange().
+                    description += " distance>=" + Utility.formatDistance(context, notifyMinTxRxKm, Utility.isMetric(context) ) + "km;";
+                }
                 notifyWspr(context, bandName, description, minSNR);
             }
 

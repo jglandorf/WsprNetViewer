@@ -241,10 +241,10 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
                rxCall = Utility.getFilterCallsign(getActivity(), false);
         String txGridsquare = Utility.getFilterGridsquare(getActivity(),  true),
                rxGridsquare = Utility.getFilterGridsquare(getActivity(), false);
-        txCall = Utility.filterCleanup(txCall);
-        rxCall = Utility.filterCleanup(rxCall);
-        txGridsquare = Utility.filterCleanup(txGridsquare);
-        rxGridsquare = Utility.filterCleanup(rxGridsquare);
+        txCall = Utility.filterCleanupForSQL(txCall);
+        rxCall = Utility.filterCleanupForSQL(rxCall);
+        txGridsquare = Utility.filterCleanupForSQL(txGridsquare);
+        rxGridsquare = Utility.filterCleanupForSQL(rxGridsquare);
         mSelection = "";
         if (Utility.isFiltered(getActivity())) {
             // When adding filters, be sure to update onResume(), and save the preference value below, too.

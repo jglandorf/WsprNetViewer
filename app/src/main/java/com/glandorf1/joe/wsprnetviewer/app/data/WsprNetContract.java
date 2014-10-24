@@ -46,7 +46,8 @@ public class WsprNetContract {
     public static final String PATH_GRIDSQUARE = "gridsquare";
 
     // Format used for storing timestamps in the database and for converting into simple date objects for comparisons.
-    public static final String TIMESTAMP_FORMAT_DB = "yyyyMMddHHmmssSSS"; //dont't use the 'Z': "yyyyMMddHHmm:ss.SSSZ"
+    public static final String TIMESTAMP_FORMAT_DB = "yyyyMMddHHmmssSSS"; //don't use the 'Z': "yyyyMMddHHmm:ss.SSSZ"
+    public static final String TIMESTAMP_FORMAT_DB_SHORT = "yyyyMMddHHmm"; //don't use the 'Z': "yyyyMMddHHmm:ss.SSSZ"
 
     /**
      * Converts Date class to a string representation, used for easy comparison and database lookup.

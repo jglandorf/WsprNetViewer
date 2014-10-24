@@ -287,8 +287,16 @@ public class Utility {
      * Trim, convert to upper case, replace wildcard characters with the SQLite wildcards,
      * and removes invalid characters from a filter:  anything other than A-Za-z0-9/%_
      */
-    public static String filterCleanup(String filter) {
+    public static String filterCleanupForSQL(String filter) {
         return filter.trim().toUpperCase().replace('*', '%').replace('?', '_').replaceAll("[^A-Za-z0-9/%_]", "");
+    }
+
+    /**
+     * Trim, convert to upper case, replace wildcard characters with the match() wildcards,
+     * and removes invalid characters from a filter:  anything other than A-Za-z0-9/%_
+     */
+    public static String filterCleanupMatch(String filter) {
+        return filter.trim().toUpperCase().replace("?", ".?").replace("*", ".*").replaceAll("[^A-Za-z0-9/\\.\\*]", "");
     }
 
     /**
@@ -319,6 +327,50 @@ public class Utility {
         String sBandId = prefs.getString(context.getString(R.string.pref_notify_band_key),
                 context.getString(R.string.pref_band_value_40m));
         return (double)(Double.parseDouble(sBandId));
+    }
+
+    /**
+     * Returns the TX or RX callsign notify filter from the preferences, or empty string if not set.
+     * @param context
+     * @param isTx
+     * @return
+     */
+    public static String getNotifyCallsign(Context context, boolean isTx) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (isTx) {
+            return prefs.getString(context.getString(R.string.pref_notify_key_tx_callsign), "");
+        } else {
+            return prefs.getString(context.getString(R.string.pref_notify_key_rx_callsign), "");
+        }
+    }
+
+    /**
+     * Returns the TX or RX gridsquare notify filter from the preferences, or empty string if not set.
+     * @param context
+     * @param isTx
+     * @return
+     */
+    public static String getNotifyGridsquare(Context context, boolean isTx) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        if (isTx) {
+            return prefs.getString(context.getString(R.string.pref_notify_key_tx_gridsquare), "");
+        } else {
+            return prefs.getString(context.getString(R.string.pref_notify_key_rx_gridsquare), "");
+        }
+    }
+
+    /**
+     * Returns the min TX-to-RX distance for wspr notifications.
+     */
+    public static double getNotifyTxRxKm(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String sValue = prefs.getString(context.getString(R.string.pref_notify_key_min_tx_rx_distance),
+                                        "-1");
+        try {
+            return (Double.parseDouble(sValue));
+        } catch (Exception e) {
+            return (double) (-1);
+        }
     }
 
     /**

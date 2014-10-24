@@ -83,6 +83,7 @@
 
     
     <string-array name="pref_notify_band_options">
+        <item>@string/pref_band_label_any</item>
         <item>@string/pref_band_label_LF</item>
         <item>@string/pref_band_label_MF</item>
         <item>@string/pref_band_label_160m</item>
@@ -102,6 +103,7 @@
     </string-array>
 
     <string-array name="pref_notify_band_values">
+        <item>@string/pref_band_value_any</item>
         <item>@string/pref_band_value_LF</item>
         <item>@string/pref_band_value_MF</item>
         <item>@string/pref_band_value_160m</item>

@@ -50,6 +50,38 @@
             android:defaultValue="@string/pref_band_value_40m"
             android:entryValues="@array/pref_notify_band_values"
             android:entries="@array/pref_notify_band_options" />
+
+        <EditTextPreference
+            android:title="@string/pref_filter_label_tx_callsign"
+            android:dialogTitle="@string/pref_filters_wildcards"
+            android:key="@string/pref_notify_key_tx_callsign"
+            android:summary="@string/pref_filter_summary_tx_callsign"
+            android:defaultValue="" />
+        <EditTextPreference
+            android:title="@string/pref_filter_label_rx_callsign"
+            android:dialogTitle="@string/pref_filters_wildcards"
+            android:key="@string/pref_notify_key_rx_callsign"
+            android:summary="@string/pref_filter_summary_rx_callsign"
+            android:defaultValue="" />
+
+        <EditTextPreference
+            android:title="@string/pref_filter_label_tx_gridsquare"
+            android:dialogTitle="@string/pref_filters_wildcards"
+            android:key="@string/pref_notify_key_tx_gridsquare"
+            android:summary="@string/pref_filter_summary_tx_gridsquare"
+            android:defaultValue="" />
+        <EditTextPreference
+            android:title="@string/pref_filter_label_rx_gridsquare"
+            android:dialogTitle="@string/pref_filters_wildcards"
+            android:key="@string/pref_notify_key_rx_gridsquare"
+            android:summary="@string/pref_filter_summary_rx_gridsquare"
+            android:defaultValue="" />
+
+        <EditTextPreference
+            android:title="@string/pref_notify_label_min_tx_rx_distance"
+            android:dialogTitle="@string/pref_notify_label_min_tx_rx_distance"
+            android:key="@string/pref_notify_key_min_tx_rx_distance"
+            android:defaultValue="" />
     </PreferenceScreen>
 
     <PreferenceScreen
@@ -88,13 +120,13 @@
             android:title="@string/pref_filter_label_tx_gridsquare"
             android:dialogTitle="@string/pref_filters_wildcards"
             android:key="@string/pref_filter_key_tx_gridsquare"
-            android:summary="@string/pref_filter_summary_tx_gridsquare"
+            android:summary="@string/pref_filter_summary_tx_callsign"
             android:defaultValue="" />
         <EditTextPreference
             android:title="@string/pref_filter_label_rx_gridsquare"
             android:dialogTitle="@string/pref_filters_wildcards"
             android:key="@string/pref_filter_key_rx_gridsquare"
-            android:summary="@string/pref_filter_summary_rx_gridsquare"
+            android:summary="@string/pref_filter_summary_rx_callsign"
             android:defaultValue="" />
     </PreferenceScreen>
 
