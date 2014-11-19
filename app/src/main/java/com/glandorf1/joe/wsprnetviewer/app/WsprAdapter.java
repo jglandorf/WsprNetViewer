@@ -103,7 +103,7 @@ public class WsprAdapter extends CursorAdapter {
         //int viewType = getItemViewType(cursor.getPosition());
         int viewType = mainDisplayFormat;
         // Get wspr icon
-        viewHolder.iconView.setImageResource(Utility.getIconResourceForWsprCondition(cursor.getDouble(WsprFragment.COL_WSPR_RX_SNR)));
+        viewHolder.iconView.setImageResource(Utility.getIconResourceForWsprCondition(cursor.getDouble(WsprFragment.COL_WSPR_RX_SNR), true));
 
         // Find TextView and set formatted timestamp on it
         viewHolder.timestampView.setText(Utility.getFormattedTimestamp(timestampString, Utility.TIMESTAMP_FORMAT_HOURS_MINUTES));

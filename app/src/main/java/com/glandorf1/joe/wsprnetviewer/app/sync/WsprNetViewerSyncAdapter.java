@@ -82,7 +82,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
             wsprSpotQuery = Utility.getPreferredGridsquare(mContext);
         // If there's no gridsquare code, there's nothing to look up.
         if (wsprSpotQuery.length() == 0) {
-            return;
+            wsprSpotQuery = "empty";
         }
 
         try {
@@ -387,7 +387,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                 notifyRxGridsquare = Utility.filterCleanupMatch(displayRxGridsquare);
         boolean snrOk = false, bandOk = false, distanceOk = false, txCallOk = false, rxCallOk = false, txGridOk = false, rxGridOk = false;
         boolean snrEna = true,
-                bandEna = (notifyBandMHz < 0.00001),
+                bandEna = (notifyBandMHz > 0.00001),
                 distanceEna = (notifyMinTxRxKm >= 0.001),
                 txCallEna = (notifyTxCallsign.length() > 0),
                 rxCallEna = (notifyRxCallsign.length() > 0),
@@ -640,7 +640,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
             if ((System.currentTimeMillis() - lastNotification) >= prefMillis) {
                 // It's been long enough since the last notification; send a new one now.
 
-                int iconId = Utility.getIconResourceForWsprCondition(snr);
+                int iconId = Utility.getIconResourceForWsprCondition(snr, false);
                 String title = context.getString(R.string.app_name);
 
                 // Define the text of the wspr notification.

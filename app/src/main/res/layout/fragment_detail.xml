@@ -24,7 +24,7 @@
                     android:id="@+id/detail_icon"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
-                    android:src="@drawable/ic_clenched_fist" />
+                    android:src="@drawable/ic_signal_pos_00" />
             </FrameLayout>
 
             <TextView

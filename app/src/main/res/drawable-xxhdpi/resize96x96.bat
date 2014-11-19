@@ -1,0 +1,15 @@
+
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0center_direction_*.png" /resize=(96,96) /convert="%~dp0center_direction_*.png"
+rem "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_*.png" /resize=(96,96) /convert="%~dp0ic_signal_*.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_00.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_00.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_05.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_05.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_10.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_10.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_15.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_15.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_20.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_20.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_25.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_25.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_30.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_30.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_35.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_35.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_40.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_40.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_45.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_45.png"
+    "C:\Program Files (x86)\IrfanView\i_view32.exe" "%~dp0ic_signal_neg_50.png" /resize=(96,96) /invert /convert="%~dp0ic_signal_pos_50.png"
+pause

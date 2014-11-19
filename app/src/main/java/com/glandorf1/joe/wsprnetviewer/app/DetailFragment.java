@@ -152,7 +152,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (arguments != null && arguments.containsKey(DetailActivity.DETAILS_KEY) &&
                 mGridsquare != null &&
                 !mGridsquare.equals(Utility.getPreferredGridsquare(getActivity()))) {
-            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this); // TODO: should this be getSupportLoaderManager?
         }
     }
 
@@ -257,7 +257,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         if (data != null && data.moveToFirst()) {
             // Read wspr SNR from cursor, display it and use it to select icon
             double rxSnr = data.getDouble(data.getColumnIndex(WsprNetContract.SignalReportEntry.COLUMN_RX_SNR));
-            mIconView.setImageResource(Utility.getIconResourceForWsprCondition((double) (rxSnr)));
+            mIconView.setImageResource(Utility.getIconResourceForWsprCondition((double) (rxSnr), true));
             mRxSnrView.setText(Utility.formatSnr(getActivity(), rxSnr));
             // For accessibility, add a content description to the icon field
             mIconView.setContentDescription(Double.toString(rxSnr) + " dBm");

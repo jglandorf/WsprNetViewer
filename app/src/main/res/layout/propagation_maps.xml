@@ -1,0 +1,89 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:map="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    >
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.03"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:id="@+id/propagation_map_fragment_container"
+        >
+        <fragment
+            android:id="@+id/propagation_map_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            class="com.google.android.gms.maps.SupportMapFragment"/>
+
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:map="http://schemas.android.com/apk/res-auto"
+            android:layout_width="wrap_content"
+            android:layout_height="40dip"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:layout_gravity="bottom"
+            android:paddingRight="60dip"
+            android:paddingBottom="4dip"
+            android:paddingLeft="4dip">
+            <!-- android:text="@string/pref_filters_map_label" -->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_fa_filter_neg"
+                android:drawableRight="@drawable/ic_action_settings_neg"
+                android:id="@+id/propagation_map_button_filters"
+                android:layout_weight="1"
+                android:background="@color/white"
+                android:alpha="0.6"
+                android:paddingBottom="4dp" />
+            <!-- adjust the spacing between buttons with the divider, not the Button padding. -->
+            <View style="@style/DividerVertical"
+                android:alpha="0.0" />
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_fa_filter_neg"
+                android:text="@string/pref_filters_wavelength_label"
+                android:id="@+id/propagation_map_button_filter_wavelength"
+                android:layout_weight="1"
+                android:background="@color/white"
+                android:alpha="0.6"
+                android:paddingBottom="4dp" />
+            <!-- adjust the spacing between buttons with the divider, not the Button padding. -->
+            <View style="@style/DividerVertical"
+                android:alpha="0.0" />
+            <!-- android:text="@string/title_activity_settings" -->
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_action_map_neg"
+                android:drawableRight="@drawable/ic_action_settings_neg"
+                android:id="@+id/propagation_map_button_settings"
+                android:layout_weight="1"
+                android:background="@color/white"
+                android:alpha="0.6"
+                android:paddingBottom="4dp" />
+            <!-- adjust the spacing between buttons with the divider, not the Button padding. -->
+            <View style="@style/DividerVertical"
+                android:alpha="0.0" />
+            <View style="@style/DividerVertical"
+                android:alpha="0.0" />
+            <!-- android:text="@string/title_activity_settings" -->
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/center_direction_neg"
+                android:id="@+id/propagation_map_button_locate"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:alpha="0.6"
+                android:layout_gravity="center_vertical" />
+        </LinearLayout>
+        </FrameLayout>
+
+</LinearLayout>

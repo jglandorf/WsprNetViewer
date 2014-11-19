@@ -45,21 +45,22 @@ import com.glandorf1.joe.wsprnetviewer.app.sync.WsprNetViewerSyncAdapter;
  * Encapsulates getting the wspr data and displaying it in a ListView layout.
  */
 public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
-    private final String LOG_TAG = MainActivity.class.getSimpleName();
+    private final String LOG_TAG = WsprFragment.class.getSimpleName();
     private static final String SELECTED_KEY = "selected_position";
     private WsprAdapter mWsprAdapter;
     private static final int WSPR_LOADER = 0;
-    private String mSelection, mGridsquare, mFilterTxCallsign, mFilterRxCallsign, mFilterTxGridsquare, mFilterRxGridsquare;
+    private String mGridsquare, mFilterTxCallsign, mFilterRxCallsign, mFilterTxGridsquare, mFilterRxGridsquare, mFilterBand;
     private boolean mFilterAnd, mFiltered;
-    private int mLastNumItems = -1;
+    private static int mLastNumItems = -1;
+    private boolean mIsVisible = false;
     private ListView mListView;
     private TextView mTVGridCallHeader;
     private int mPosition = ListView.INVALID_POSITION;  // selected item's position
-    private boolean mDualPane; // provision for putting the details fragment next to this fragment for wider screens
+    private boolean mDualPane = false; // provision for putting the details fragment next to this fragment for wider screens
 
     // For the wspr view, show only a subset of the stored data.
     // Specify the columns we need; this is the 'projection' parameter passed to query().
-    private static final String[] WSPR_COLUMNS = {
+    public static final String[] WSPR_COLUMNS = {
             // Fully qualify the id with a table name in case the content provider joins the
             // gridsquare & wspr tables in the background--both have an _id column.
             WsprNetContract.SignalReportEntry.TABLE_NAME + "." + WsprNetContract.SignalReportEntry._ID,
@@ -107,6 +108,20 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
     }
 
     public WsprFragment() {
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (this.isVisible()) { // This will likely always be true.
+            // This doesn't work when a preference dialog was covering the fragment!
+            if (!isVisibleToUser) {
+                Log.v(LOG_TAG, "setUserVisibleHint:  Becoming INvisible");
+            } else {
+                Log.v(LOG_TAG, "setUserVisibleHint:  Becoming visible");
+            }
+        }
+        mIsVisible = isVisibleToUser;
     }
 
     @Override
@@ -194,7 +209,8 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
-        getLoaderManager().initLoader(WSPR_LOADER, null, this);
+        // TODO: should this be getSupportLoaderManager?
+        getLoaderManager().initLoader(WSPR_LOADER, null, this); // TODO: should this be getSupportLoaderManager?
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -205,6 +221,7 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
 
     @Override
     public void onResume() {
+        // Will come here when the Settings menu is dismissed.
         super.onResume();
         boolean filterOn = Utility.isFiltered(getActivity());
         // Restart the loader if some of the preferences have changed.
@@ -213,13 +230,14 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
                         || ((mFilterRxCallsign   != null) && !mFilterRxCallsign.equals((Utility.getFilterCallsign(getActivity(), false))))
                         || ((mFilterTxGridsquare != null) && !mFilterTxGridsquare.equals((Utility.getFilterGridsquare(getActivity(), true))))
                         || ((mFilterRxGridsquare != null) && !mFilterRxGridsquare.equals((Utility.getFilterGridsquare(getActivity(), false))))
+                        || ((mFilterBand         != null) && !mFilterBand.equals((Utility.getFilterBand(getActivity()))))
                         || (mFilterAnd != Utility.isFilterAnd(getActivity()))
                        )
             || (mFiltered != Utility.isFiltered(getActivity())) // or filter on/off has changed
             || (mWsprAdapter.mainDisplayFormat !=  Utility.getMainDisplayPreference(getActivity())) // or layout has changed
            ) {
             mLastNumItems = -1; // reset so that notification will appear
-            getLoaderManager().restartLoader(WSPR_LOADER, null, this);
+            getLoaderManager().restartLoader(WSPR_LOADER, null, this); // TODO: should this be getSupportLoaderManager?
         }
     }
 
@@ -228,51 +246,21 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
         // This is called when a new Loader needs to be created.  This
         // fragment only uses one loader, so we don't care about checking the id.
 
-        // TODO: Filter the query to only return data from today and the previous N days.
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(new Date());
-//        cal.add(Calendar.DATE, -7); // N= 7
-//        Date cutoffDate = cal.getTime();
-//        String startTimestamp = WsprNetContract.getDbTimestampString(cutoffDate);
-
         // Sort order:  Descending, by timestamp.
         String sortOrder = WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " DESC";
-        String txCall = Utility.getFilterCallsign(getActivity(), true),
-               rxCall = Utility.getFilterCallsign(getActivity(), false);
-        String txGridsquare = Utility.getFilterGridsquare(getActivity(),  true),
-               rxGridsquare = Utility.getFilterGridsquare(getActivity(), false);
-        txCall = Utility.filterCleanupForSQL(txCall);
-        rxCall = Utility.filterCleanupForSQL(rxCall);
-        txGridsquare = Utility.filterCleanupForSQL(txGridsquare);
-        rxGridsquare = Utility.filterCleanupForSQL(rxGridsquare);
-        mSelection = "";
+        String mSelection = "", mSelectionBand = "";
         if (Utility.isFiltered(getActivity())) {
-            // When adding filters, be sure to update onResume(), and save the preference value below, too.
-            String prefAndOr = Utility.isFilterAnd(getActivity()) ? " and " : " or ";
-            String sAndOr = " ";
-            if (txCall.length() > 0) {
-                sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
-                mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_TX_CALLSIGN + " like '" + txCall + "')";
+            mSelection = Utility.getFilterSelectionStringForSql(getActivity());
+            mSelectionBand = Utility.getFilterBandSelectionStringForSql(getActivity(), 5., true);
+            if (mSelectionBand.length() > 0) {
+                if (mSelection.length() > 0) {
+                    mSelection += " and ";
+                }
+                mSelection += mSelectionBand;
             }
-            if (rxCall.length() > 0) {
-                sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
-                mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_RX_CALLSIGN + " like '" + rxCall + "')";
-            }
-            if (txGridsquare.length() > 0) {
-                sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
-                mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_TX_GRIDSQUARE + " like '" + txGridsquare + "')";
-            }
-            if (rxGridsquare.length() > 0) {
-                sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
-                mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_RX_GRIDSQUARE + " like '" + rxGridsquare + "')";
-            }
-            // Examples of resulting 'selection' clause:
-            //   tx_callsign like 'D%'
-            //   (tx_gridsquare like 'D%') and (rx_callsign like 'N%')
-            //   (tx_gridsquare like 'D%') or (rx_callsign like 'N%')
-            if (mSelection.length() > 0) {
+            if (mIsVisible && (mSelection.length() > 0)) {
                 // Remind user that items are filtered, in case the result is not what they expect.
-                Toast.makeText(getActivity(), getActivity().getString(R.string.toast_filter_items), Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), getActivity().getString(R.string.toast_filter_items), Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -314,8 +302,8 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
         mFilterRxGridsquare = Utility.getFilterGridsquare(getActivity(), false);
         mFilterAnd = Utility.isFilterAnd(getActivity());
         mFiltered = Utility.isFiltered(getActivity());
-        Uri wsprUri;
-        wsprUri = WsprNetContract.SignalReportEntry.buildWspr();
+        mFilterBand = Utility.getFilterBand(getActivity());
+        Uri wsprUri = WsprNetContract.SignalReportEntry.buildWspr();
 
         // Create and return a CursorLoader that will take care of creating a Cursor for the data being displayed.
         return new CursorLoader(
@@ -329,20 +317,28 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Integer n = data.getCount();
-        Log.v(LOG_TAG, "WsprFragment: onLoadFinished:  data.getCount()= " + n.toString());
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        Integer n = (cursor == null)? 0 : cursor.getCount();
+        Log.v(LOG_TAG, "onLoadFinished:  data.getCount()= " + n.toString());
         if ((n == 0) && (mLastNumItems != 0)) {
             // only do this once if there are no items
-            Toast.makeText(getActivity(), getActivity().getString(R.string.toast_no_items), Toast.LENGTH_LONG).show();
-            WsprNetViewerSyncAdapter.syncImmediately(getActivity());
+            if (mIsVisible) {
+                Toast.makeText(getActivity(), getActivity().getString(R.string.toast_no_items), Toast.LENGTH_LONG).show();
+            }
+            mWsprAdapter.swapCursor(cursor);
+            mPosition = ListView.INVALID_POSITION;
+            if (!Utility.isFiltered(getActivity())) { // TODO: check total # records in database instead
+                WsprNetViewerSyncAdapter.syncImmediately(getActivity());
+            }
         } else if (n > 0) {
+            if (mIsVisible) {
             String msg = getActivity().getString(R.string.toast_num_items, n);
-            Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
-        }
-        mWsprAdapter.swapCursor(data);
-        if (mPosition != ListView.INVALID_POSITION) {
-            mListView.smoothScrollToPosition(mPosition);
+                Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+            }
+            mWsprAdapter.swapCursor(cursor);
+            if (mPosition != ListView.INVALID_POSITION) {
+                mListView.smoothScrollToPosition(mPosition);
+            }
         }
         mLastNumItems = n;
 

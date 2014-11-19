@@ -1,0 +1,73 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.glandorf1.joe.wsprnetviewer.app.PropagationMapsSettingsDialog">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/propagation_maps_settings_label_map_type"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <RadioGroup
+                android:id="@+id/propagation_maps_settings_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                >
+                <RadioButton
+                    android:id="@+id/propagation_maps_settings_type_heat"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/propagation_maps_settings_label_heat"
+                    android:tag="@string/pref_maps_settings_key_map_type_heat"
+                    android:checked="true"
+                    />
+                <RadioButton
+                    android:id="@+id/propagation_maps_settings_type_great_circle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/propagation_maps_settings_label_great_circle"
+                    android:tag="@string/pref_maps_settings_key_map_type_great_circle"
+                    />
+            </RadioGroup>
+        </LinearLayout>
+        <View style="@style/Divider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/pref_maps_settings_markers_label"
+            />
+        <CheckBox
+            android:id="@+id/propagation_maps_settings_markers_tx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:paddingTop="4dip"
+            android:tag="@string/pref_maps_settings_markers_tx_key"
+            android:text="@string/string_tx"
+            android:textAppearance="?android:textAppearanceMedium" />
+        <CheckBox
+            android:id="@+id/propagation_maps_settings_markers_rx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:paddingTop="4dip"
+            android:tag="@string/pref_maps_settings_markers_rx_key"
+            android:text="@string/string_rx"
+            android:textAppearance="?android:textAppearanceMedium" />
+
+    </LinearLayout>
+</ScrollView>
+

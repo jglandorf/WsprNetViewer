@@ -1,0 +1,157 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.glandorf1.joe.wsprnetviewer.app.PropagationMapsFiltersDialog">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <CheckBox
+            android:id="@+id/propagation_maps_filter_enable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:paddingTop="4dip"
+            android:tag="@string/pref_filter_map_enable_key"
+            android:text="@string/pref_filter_enable_label"
+            android:textAppearance="?android:textAppearanceLarge" />
+        <View style="@style/Divider" />
+        <View style="@style/Divider" />
+
+        <CheckBox
+            android:id="@+id/propagation_maps_filter_match_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:paddingTop="4dip"
+            android:tag="@string/pref_filter_key_match_all"
+            android:text="@string/pref_filter_label_match_all"
+            android:textAppearance="?android:textAppearanceLarge" />
+
+        <View style="@style/Divider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/string_press_done_on_keyboard"
+            android:textColor="@color/wspr_brown"
+            android:textStyle="italic" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/propagation_maps_filter_label_tx_callsign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="2dip"
+                android:paddingRight="2dip"
+                android:paddingTop="4dip"
+                android:text="@string/pref_filter_label_tx_callsign"
+                android:textAppearance="?android:textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/propagation_maps_filter_tx_callsign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:imeOptions="actionDone"
+                android:paddingTop="4dip"
+                android:singleLine="true"
+                android:tag="@string/pref_filter_map_key_tx_callsign"
+                android:text="@string/pref_filter_label_tx_callsign"
+                android:textAppearance="?android:textAppearanceLarge" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/propagation_maps_filter_label_rx_callsign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="2dip"
+                android:paddingRight="2dip"
+                android:paddingTop="4dip"
+                android:text="@string/pref_filter_label_rx_callsign"
+                android:textAppearance="?android:textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/propagation_maps_filter_rx_callsign"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:imeOptions="actionDone"
+                android:paddingTop="4dip"
+                android:singleLine="true"
+                android:tag="@string/pref_filter_map_key_rx_callsign"
+                android:text="@string/pref_filter_label_rx_callsign"
+                android:textAppearance="?android:textAppearanceLarge" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/propagation_maps_filter_label_tx_gridsquare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="2dip"
+                android:paddingRight="2dip"
+                android:paddingTop="4dip"
+                android:text="@string/pref_filter_label_tx_gridsquare"
+                android:textAppearance="?android:textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/propagation_maps_filter_tx_gridsquare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:imeOptions="actionDone"
+                android:paddingTop="4dip"
+                android:singleLine="true"
+                android:tag="@string/pref_filter_map_key_tx_gridsquare"
+                android:text="@string/pref_filter_label_tx_gridsquare"
+                android:textAppearance="?android:textAppearanceLarge" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/propagation_maps_filter_label_rx_gridsquare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="2dip"
+                android:paddingRight="2dip"
+                android:paddingTop="4dip"
+                android:text="@string/pref_filter_label_rx_gridsquare"
+                android:textAppearance="?android:textAppearanceMedium" />
+
+            <EditText
+                android:id="@+id/propagation_maps_filter_rx_gridsquare"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusableInTouchMode="true"
+                android:imeOptions="actionDone"
+                android:paddingTop="4dip"
+                android:singleLine="true"
+                android:tag="@string/pref_filter_map_key_rx_gridsquare"
+                android:text="@string/pref_filter_label_rx_gridsquare"
+                android:textAppearance="?android:textAppearanceLarge" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+

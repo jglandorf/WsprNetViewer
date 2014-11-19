@@ -6,8 +6,11 @@
     <color name="grey_700">#646464</color> <!-- 100 100 100 -->
     <color name="black">#000000</color>    <!--   0   0   0 -->
 
+    <color name="wspr_light_gray">#ffdcdcdc</color> <!-- 220 220 220 -->
+    <color name="wspr_light_blue_gray">#ff98c4d2</color> <!-- 152 196 210 -->
     <color name="wspr_light_blue">#ff64c2f4</color> <!-- 100 194 244 -->
     <color name="wspr_blue">#ff1ca8f4</color>       <!--  28 168 244 -->
+    <color name="wspr_dark_blue">#ff076496</color>  <!--  7 100 150 -->
     <color name="wspr_red">#ffff2828</color>        <!-- 242  40  40 -->
     <color name="wspr_orange">#ffff8000</color>     <!-- 255 128   0 -->
     <color name="wspr_brown">#ff804000</color>      <!-- 128  64   0 -->

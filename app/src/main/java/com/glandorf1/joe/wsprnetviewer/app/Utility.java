@@ -48,6 +48,11 @@ public class Utility {
     public static final String TIMESTAMP_FORMAT_HOURS_MINUTES = "HH:mm"; // use "EEE MMM dd" "Day Month day#": Mon Sep 1
     public static final int MAIN_DISPLAY_GRIDSQUARE = 0x01, MAIN_DISPLAY_CALLSIGN = 0x02, MAIN_DISPLAY_GRIDCALL = 0x03;
 
+    // TODO: consolidate this with similar code in the sync adapter
+    private static final double mBandFrequencyTolerancePercent = 5.;
+    private static String[] mBandFrequencyMin, mBandFrequencyMax;
+    private static String[] mBandFrequencyStr, mBandFrequencyKeysStr;
+
 
     // Delete all database records.
     public static void deleteAllRecords(Context context) {
@@ -163,12 +168,12 @@ public class Utility {
         longitude = longitude + 180.;
         latitude = latitude + 90.;
 
-        gridsquare += 'A' + (char)(int)(longitude / 20.);
-        gridsquare += 'A' + (char)(int)(latitude / 10.);
-        gridsquare += '0' + (char)(int)((longitude % 20.)/2.);
-        gridsquare += '0' + (char)(int)((latitude % 10.)/1.);
-        gridsquare += 'a' + (char)(int)((longitude - ((int)(longitude/2.)*2.)) / (5./60.));
-        gridsquare += 'a' + (char)(int)((latitude - ((int)(latitude/1)*1)) / (2.5/60.));
+        gridsquare += (char)((int)'A' + (int)(longitude / 20.));
+        gridsquare += (char)((int)'A' + (int)(latitude / 10.));
+        gridsquare += (char)((int)'0' + (int)((longitude % 20.)/2.));
+        gridsquare += (char)((int)'0' + (int)((latitude % 10.)/1.));
+        gridsquare += (char)((int)'a' + (int)((longitude - ((int)(longitude/2.)*2.)) / (5./60.)));
+        gridsquare += (char)((int)'a' + (int)((latitude - ((int)(latitude/1)*1)) / (2.5/60.)));
         return gridsquare;
     }
 
@@ -197,8 +202,11 @@ public class Utility {
             double deg90 = pi / 2; // 90 degrees, in radians
             double b = Math.acos(Math.cos(deg90 - lat2) * Math.cos(deg90 - lat1) + Math.sin(deg90 - lat2) * Math.sin(deg90 - lat1) * Math.cos(long2 - long1));
             //double d = r * b; // optionally calculate distance
-            azimuth = 180. * Math.asin(Math.sin(deg90 - lat2) * Math.sin(long2 - long1) / Math.sin(b)) / pi;
-            azimuth = (azimuth + 360.) % 360.;
+            double sinb = Math.sin(b);
+            if (Math.abs(sinb) > 0.000000000001) {
+                azimuth = 180. * Math.asin(Math.sin(deg90 - lat2) * Math.sin(long2 - long1) / sinb) / pi;
+                azimuth = (azimuth + 360.) % 360.;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -284,6 +292,16 @@ public class Utility {
     }
 
     /**
+     * Returns the band (wavelength) filter from the preferences, or empty string if not set.
+     * @param context
+     * @return
+     */
+    public static String getFilterBand(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(context.getString(R.string.pref_filter_band_key), "");
+    }
+
+    /**
      * Trim, convert to upper case, replace wildcard characters with the SQLite wildcards,
      * and removes invalid characters from a filter:  anything other than A-Za-z0-9/%_
      */
@@ -297,6 +315,195 @@ public class Utility {
      */
     public static String filterCleanupMatch(String filter) {
         return filter.trim().toUpperCase().replace("?", ".?").replace("*", ".*").replaceAll("[^A-Za-z0-9/\\.\\*]", "");
+    }
+
+    /**
+     * getFilterSelectionStringForSql
+     * Based on the user filter preferences, return a SQL 'selection' string.
+     * The user preference pref_filter_enable_key is NOT checked here.
+     */
+    public static String getFilterSelectionStringForSql(Context context) {
+        String mSelection;
+        String txCall = Utility.getFilterCallsign(context, true),
+                rxCall = Utility.getFilterCallsign(context, false);
+        String txGridsquare = Utility.getFilterGridsquare(context,  true),
+                rxGridsquare = Utility.getFilterGridsquare(context, false);
+        txCall = Utility.filterCleanupForSQL(txCall);
+        rxCall = Utility.filterCleanupForSQL(rxCall);
+        txGridsquare = Utility.filterCleanupForSQL(txGridsquare);
+        rxGridsquare = Utility.filterCleanupForSQL(rxGridsquare);
+        mSelection = "";
+        // When adding filters, be sure to update onResume(), and save the preference value below, too.
+        String prefAndOr = Utility.isFilterAnd(context) ? " and " : " or ";
+        String sAndOr = " ";
+        if (txCall.length() > 0) {
+            sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+            mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_TX_CALLSIGN + " like '" + txCall + "')";
+        }
+        if (rxCall.length() > 0) {
+            sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+            mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_RX_CALLSIGN + " like '" + rxCall + "')";
+        }
+        if (txGridsquare.length() > 0) {
+            sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+            mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_TX_GRIDSQUARE + " like '" + txGridsquare + "')";
+        }
+        if (rxGridsquare.length() > 0) {
+            sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+            mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_RX_GRIDSQUARE + " like '" + rxGridsquare + "')";
+        }
+        // Examples of resulting 'selection' clause:
+        //   tx_callsign like 'D%'
+        //   (tx_gridsquare like 'D%') and (rx_callsign like 'N%')
+        //   (tx_gridsquare like 'D%') or (rx_callsign like 'N%')
+        return mSelection;
+    }
+    /**
+     * getMapsFilterSelectionStringForSql
+     * Based on the user filter preferences, return a SQL 'selection' string.
+     * The user preference pref_filter_enable_key is NOT checked here.
+     */
+    public static String getMapsFilterSelectionStringForSql(Context context) {
+        String mSelection;
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String txCall = prefs.getString(context.getString(R.string.pref_filter_map_key_tx_callsign), ""),
+                rxCall = prefs.getString(context.getString(R.string.pref_filter_map_key_rx_callsign), "");
+        String txGridsquare = prefs.getString(context.getString(R.string.pref_filter_map_key_tx_gridsquare), ""),
+                rxGridsquare = prefs.getString(context.getString(R.string.pref_filter_map_key_rx_gridsquare), "");
+        txCall = Utility.filterCleanupForSQL(txCall);
+        rxCall = Utility.filterCleanupForSQL(rxCall);
+        txGridsquare = Utility.filterCleanupForSQL(txGridsquare);
+        rxGridsquare = Utility.filterCleanupForSQL(rxGridsquare);
+        mSelection = "";
+        boolean mFilterAnd = prefs.getBoolean(context.getString(R.string.pref_filter_map_key_match_all),
+                Boolean.parseBoolean(context.getString(R.string.pref_filter_match_all_default)));
+        // When adding filters, be sure to update onResume(), and save the preference value below, too.
+        String prefAndOr = mFilterAnd ? " and " : " or ";
+        String sAndOr = " ";
+        if (txCall.length() > 0) {
+            sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+            mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_TX_CALLSIGN + " like '" + txCall + "')";
+        }
+        if (rxCall.length() > 0) {
+            sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+            mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_RX_CALLSIGN + " like '" + rxCall + "')";
+        }
+        if (txGridsquare.length() > 0) {
+            sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+            mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_TX_GRIDSQUARE + " like '" + txGridsquare + "')";
+        }
+        if (rxGridsquare.length() > 0) {
+            sAndOr = (mSelection.length() > 0) ? prefAndOr : "";
+            mSelection += sAndOr + "(" + WsprNetContract.SignalReportEntry.COLUMN_RX_GRIDSQUARE + " like '" + rxGridsquare + "')";
+        }
+        // Examples of resulting 'selection' clause:
+        //   tx_callsign like 'D%'
+        //   (tx_gridsquare like 'D%') and (rx_callsign like 'N%')
+        //   (tx_gridsquare like 'D%') or (rx_callsign like 'N%')
+        return mSelection;
+    }
+
+    /**
+     * Based on the user filter preferences, return a SQL 'selection' string for the frequency.
+     * The user preference pref_filter_enable_key is NOT checked here.
+     * @param context
+     * @param tolerancePercent - freqMhz is in the band if within +/-tolerance of the band's center frequency
+     * @return Returns -1 if not within a valid frequency band; also sets mBandNameIdx.
+     */
+    public static String getFilterBandSelectionStringForSql(Context context, double tolerancePercent, boolean wsprNotMaps) {
+        String mSelection = "";
+        if ((mBandFrequencyStr == null) || (mBandFrequencyStr.length <= 0)) {
+            mBandFrequencyStr = context.getResources().getStringArray(R.array.pref_notify_band_values);
+            mBandFrequencyKeysStr = context.getResources().getStringArray(R.array.pref_notify_band_options);
+        }
+        if ((mBandFrequencyStr != null) && mBandFrequencyStr.length > 0) {
+            if ((mBandFrequencyMin == null) || (mBandFrequencyMin.length <= 0)) {
+                mBandFrequencyMin = new String[mBandFrequencyStr.length];
+                mBandFrequencyMax = new String[mBandFrequencyStr.length];
+                if ((tolerancePercent < 1.) || (tolerancePercent > 20.)) {
+                    tolerancePercent = 5.;
+                }
+                // Set up the min/max frequency limits for each band-- nominally +/-5% around center frequency.
+                tolerancePercent = tolerancePercent / 100.;
+                for (int i = 0; i < mBandFrequencyStr.length; i++) {
+                    Double freq = 0., min = 0., max = 0.;
+                    try {
+                        freq = Double.parseDouble(mBandFrequencyStr[i]);
+                        min = freq - (freq * tolerancePercent);
+                        max = freq + (freq * tolerancePercent);
+                        mBandFrequencyMin[i] = min.toString();
+                        mBandFrequencyMax[i] = max.toString();
+                    } catch (NumberFormatException e) {
+                        mBandFrequencyMin[i] = "";
+                        mBandFrequencyMax[i] = "";
+                    };
+                }
+            }
+        }
+
+        // Get the current boolean preference for each frequency band.
+        if (   (mBandFrequencyMin != null) && (mBandFrequencyMin.length > 0)
+            && (mBandFrequencyMax != null) && (mBandFrequencyMax.length > 0) ) {
+            String colFreq = WsprNetContract.SignalReportEntry.COLUMN_TX_FREQ_MHZ;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            int count = 0, countMax = 0, i;
+            String[] wsprValues = null;
+            boolean checked;
+            if (wsprNotMaps) {
+                // WSPR band preferences come back as a single string that is parsed into a string array.
+                CharSequence sPrefs = prefs.getString(context.getString(R.string.pref_filter_band_key), "");
+                wsprValues = ListPreferenceMultiSelect.parseStoredValue(sPrefs); // get list of 'checked' prefs
+            }
+            // For each potential frequency band option, check if there is a preference checked off for it.
+            for (i = 0; i < mBandFrequencyMin.length; i++) {
+                if (   (mBandFrequencyMin[i].length() > 0)
+                        && (mBandFrequencyMax[i].length() > 0)
+                        && (!mBandFrequencyMax[i].equals("0.0"))) {
+                    countMax++;
+                    checked = false;
+                    if (wsprNotMaps) {
+                        if ((wsprValues == null) || (wsprValues.length == 0)) {
+                            break;
+                        }
+                        // scan the preference array
+                        for (String preference: wsprValues) {
+                            if ((preference != null) && (mBandFrequencyStr[i] != null) && mBandFrequencyStr[i].equals(preference)) {
+                                checked = true;
+                                break;
+                            }
+                        } // option values
+                    } else {
+                        // Maps band preferences are stored individually.
+                        // Tag is the key prefix and option suffix:
+                        //   "pref_map_band_any"
+                        //   "pref_map_band_17m"
+                        String key = context.getString(R.string.pref_map_band_key_) + mBandFrequencyKeysStr[i];
+                        boolean def = false; // Boolean.parseBoolean(getActivity().getString(R.string.pref_filter_enable_default));
+                        checked = prefs.getBoolean(key, def);
+                    }
+                    if (checked) {
+                        count++;
+                        // Example of resulting 'selection' clause:
+                        //   (freqMin >= mhz) and (mhz <= freqMax)
+                        //   (((3.515 >= mhz) and (mhz <= 3.885)))
+                        //   (((3.515 >= mhz) and (mhz <= 3.885)) or ((138.7 >= mhz) and (mhz <= 153.3)))
+                        String sel = "((" + mBandFrequencyMin[i] + " <= " + colFreq + ") and (" + colFreq + "<=" + mBandFrequencyMax[i] + "))";
+                        if (mSelection.length() <= 0) {
+                            mSelection = sel;
+                        } else {
+                            mSelection += " or " + sel;
+                        }
+                    }
+                }
+            }
+            if (count == countMax) {
+                mSelection = "";  // all items checked ==> turn off filter
+            }
+        }
+        if (mSelection.length() > 0) {
+            mSelection = "(" + mSelection + ")";
+        }
+        return mSelection;
     }
 
     /**
@@ -542,25 +749,23 @@ public class Utility {
 
     /**
      * Helper method to provide the icon resource id according to the wspr condition id returned
-     * by the WSPR call.
+     * by the WSPR call.  Per wsprnet.org website, "typical values are -30 to +20dB."
      * @param rxSnr from WSPR API response
      * @return resource id for the corresponding icon. -1 if no relation is found.
      */
-    public static int getIconResourceForWsprCondition(double rxSnr) {
-        // TODO: rework icon resources
-        if (rxSnr >= 0.) {
-            return R.drawable.ic_four_fingers;
-        } else if (rxSnr >= -5. && rxSnr < 0.) {
-            return R.drawable.ic_three_fingers;
-        } else if (rxSnr >= -10. && rxSnr < -5.) {
-            return R.drawable.ic_two_fingers;
-        } else if (rxSnr >= -15. && rxSnr < -10.) {
-            return R.drawable.ic_one_finger;
-        } else if (rxSnr >= -20. && rxSnr < -15.) {
-            return R.drawable.ic_clenched_fist;
-        } else {
-            return R.drawable.ic_clenched_fist;
-        }
+    public static int getIconResourceForWsprCondition(double rxSnr, boolean p) {
+        p = !p;
+        if      (( 15. <= rxSnr)                  ) {  return p? R.drawable.ic_signal_pos_50 : R.drawable.ic_signal_neg_50; }
+        else if (( 10. <= rxSnr) && (rxSnr <  15.)) {  return p? R.drawable.ic_signal_pos_45 : R.drawable.ic_signal_neg_45; }
+        else if ((  5. <= rxSnr) && (rxSnr <  10.)) {  return p? R.drawable.ic_signal_pos_40 : R.drawable.ic_signal_neg_40; }
+        else if ((  0. <= rxSnr) && (rxSnr <   5.)) {  return p? R.drawable.ic_signal_pos_35 : R.drawable.ic_signal_neg_35; }
+        else if (( -5. <= rxSnr) && (rxSnr <   0.)) {  return p? R.drawable.ic_signal_pos_30 : R.drawable.ic_signal_neg_30; }
+        else if ((-10. <= rxSnr) && (rxSnr <  -5.)) {  return p? R.drawable.ic_signal_pos_25 : R.drawable.ic_signal_neg_25; }
+        else if ((-15. <= rxSnr) && (rxSnr < -10.)) {  return p? R.drawable.ic_signal_pos_20 : R.drawable.ic_signal_neg_20; }
+        else if ((-20. <= rxSnr) && (rxSnr < -15.)) {  return p? R.drawable.ic_signal_pos_15 : R.drawable.ic_signal_neg_15; }
+        else if ((-25. <= rxSnr) && (rxSnr < -20.)) {  return p? R.drawable.ic_signal_pos_10 : R.drawable.ic_signal_neg_10; }
+        else if ((-30. <= rxSnr) && (rxSnr < -25.)) {  return p? R.drawable.ic_signal_pos_05 : R.drawable.ic_signal_neg_05; }
+        else {                                         return p? R.drawable.ic_signal_pos_00 : R.drawable.ic_signal_neg_00; }
     }
 
 }  // class Utility

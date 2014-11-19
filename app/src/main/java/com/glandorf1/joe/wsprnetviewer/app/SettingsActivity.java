@@ -40,6 +40,7 @@ import com.glandorf1.joe.wsprnetviewer.app.sync.WsprNetViewerSyncAdapter;
  */
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
     private static final String LOG_TAG = SettingsActivity.class.getSimpleName();
+    public static final String SUB_MENU_WSPR_FILTER_KEY = "wspr_filters";
 
     // since we use the preference change initially to populate the summary
     // field, we'll ignore that change at start of the activity
@@ -50,42 +51,63 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        int menuId = getIntent().getIntExtra(SUB_MENU_WSPR_FILTER_KEY, R.xml.pref_general);
         // Add 'general' preferences, defined in the XML file
-        addPreferencesFromResource(R.xml.pref_general);
+        addPreferencesFromResource(menuId);
+//        addPreferencesFromResource(R.xml.pref_general);
 
-        // Fix (hack) for gray text on black background on Android 2.3.4; see http://stackoverflow.com/questions/3164862/black-screen-in-inner-preferencescreen
-        getWindow().setBackgroundDrawableResource(R.color.white); // ??
-        PreferenceScreen b = (PreferenceScreen) findPreference(getString(R.string.pref_notifications_key));
-        b.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-            @Override
-            public boolean onPreferenceClick(Preference preference) {
-                PreferenceScreen a = (PreferenceScreen) preference;
-                a.getDialog().getWindow().setBackgroundDrawableResource(R.color.white);
-                return false;
-            }
-        });
+        try {
+            // Fix (hack) for gray text on black background on Android 2.3.4; see http://stackoverflow.com/questions/3164862/black-screen-in-inner-preferencescreen
+            getWindow().setBackgroundDrawableResource(R.color.white); // ??
+            PreferenceScreen b = (PreferenceScreen) findPreference(getString(R.string.pref_filters_key));
+            b.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    PreferenceScreen a = (PreferenceScreen) preference;
+                    a.getDialog().getWindow().setBackgroundDrawableResource(R.color.white);
+                    return false;
+                }
+            });
+        } catch (NullPointerException e) {
+            Log.v(LOG_TAG, "onCreate:  NullPointerException for setOnPreferenceClickListener");
+        }
 
         // For all preferences, attach an OnPreferenceChangeListener so the UI summary can be
         // updated when the preference changes.
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_gridsquare_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_main_display_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_enable_notifications_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_min_snr_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_band_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_recent_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_update_interval_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_enable_key)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_tx_callsign)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_rx_callsign)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_tx_gridsquare)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_rx_gridsquare)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_min_tx_rx_distance)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_match_all)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_tx_callsign)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_rx_callsign)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_tx_gridsquare)));
-        bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_rx_gridsquare)));
+        if (menuId == R.xml.pref_general) {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_gridsquare_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_units_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_main_display_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_enable_notifications_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_min_snr_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_band_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_recent_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_update_interval_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_tx_callsign)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_rx_callsign)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_tx_gridsquare)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_rx_gridsquare)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_notify_key_min_tx_rx_distance)));
+        }
+        if ((menuId == R.xml.pref_general)
+                || (menuId == R.xml.pref_wspr_filters)) {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_enable_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_match_all)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_band_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_tx_callsign)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_rx_callsign)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_tx_gridsquare)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_key_rx_gridsquare)));
+        }
+        if (menuId == R.xml.pref_map_filters) {
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_map_enable_key)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_map_key_match_all)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_map_key_tx_callsign)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_map_key_rx_callsign)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_map_key_tx_gridsquare)));
+            bindPreferenceSummaryToValue(findPreference(getString(R.string.pref_filter_map_key_rx_gridsquare)));
+        }
+
     }
 
     /**
@@ -152,7 +174,12 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             }
         }
 
-        if (preference instanceof ListPreference) {
+        if (preference instanceof ListPreferenceMultiSelect) {
+            ListPreferenceMultiSelect listPreference = (ListPreferenceMultiSelect) preference;
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            String s = prefs.getString(listPreference.getKey(), "");
+            listPreference.setSummary(s);
+        } else if (preference instanceof ListPreference) {
             // For list preferences, look up the correct display value in
             // the preference's 'entries' list (since they have separate labels/values).
             ListPreference listPreference = (ListPreference) preference;

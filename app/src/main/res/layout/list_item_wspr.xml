@@ -32,7 +32,7 @@
 
 
         <FrameLayout
-            android:layout_width="32dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingLeft="0dp"
             android:paddingRight="0dp"
@@ -41,9 +41,11 @@
             <ImageView
                 android:id="@+id/list_item_icon"
                 android:layout_gravity="center"
-                android:layout_width="32dp"
-                android:layout_height="32dp"
-                android:src="@drawable/ic_clenched_fist" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="0dp"
+                android:paddingRight="0dp"
+                android:src="@drawable/ic_signal_neg_00" />
 
         </FrameLayout>
     </LinearLayout>

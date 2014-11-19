@@ -62,7 +62,7 @@
         style="@style/WsprListStyle"
         android:id="@+id/listview_wspr"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@id/layout_list_header_divider"
         android:divider="@color/wspr_blue"
         android:dividerHeight="1px"

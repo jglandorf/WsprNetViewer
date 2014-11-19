@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:title="@string/pref_filters_wspr_label"
+    android:key="@string/pref_filters_key" >
+
+        <CheckBoxPreference
+            android:title="@string/pref_filter_enable_label"
+            android:key="@string/pref_filter_enable_key"
+            android:summaryOff="@string/pref_filter_enable_false"
+            android:summaryOn="@string/pref_filter_enable_true"
+            android:defaultValue="@string/pref_filter_enable_default" />
+
+        <CheckBoxPreference
+            android:title="@string/pref_filter_label_match_all"
+            android:key="@string/pref_filter_key_match_all"
+            android:summaryOff="@string/pref_filter_match_all_false"
+            android:summaryOn="@string/pref_filter_match_all_true"
+            android:defaultValue="@string/pref_filter_match_all_default" />
+
+        <EditTextPreference
+            android:title="@string/pref_filter_label_tx_callsign"
+            android:key="@string/pref_filter_key_tx_callsign"
+            android:summary="@string/pref_filter_summary_tx_callsign"
+            android:defaultValue="" />
+        <EditTextPreference
+            android:title="@string/pref_filter_label_rx_callsign"
+            android:dialogTitle="@string/pref_filters_wildcards"
+            android:key="@string/pref_filter_key_rx_callsign"
+            android:summary="@string/pref_filter_summary_rx_callsign"
+            android:defaultValue="" />
+
+        <EditTextPreference
+            android:title="@string/pref_filter_label_tx_gridsquare"
+            android:dialogTitle="@string/pref_filters_wildcards"
+            android:key="@string/pref_filter_key_tx_gridsquare"
+            android:summary="@string/pref_filter_summary_tx_callsign"
+            android:defaultValue="" />
+        <EditTextPreference
+            android:title="@string/pref_filter_label_rx_gridsquare"
+            android:dialogTitle="@string/pref_filters_wildcards"
+            android:key="@string/pref_filter_key_rx_gridsquare"
+            android:summary="@string/pref_filter_summary_rx_callsign"
+            android:defaultValue="" />
+
+</PreferenceScreen>

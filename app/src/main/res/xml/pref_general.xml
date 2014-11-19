@@ -7,8 +7,10 @@
         android:title="@string/pref_gridsquare_label"
         android:key="@string/pref_gridsquare_key"
         android:defaultValue="@string/pref_gridsquare_default"
-        android:inputType="text"
-        android:singleLine="true" />
+        android:inputType="textNoSuggestions"
+        android:singleLine="true"
+        android:id="@+id/pref_gridsquare_id"
+        />
 
     <ListPreference
         android:title="@string/pref_units_label"
@@ -87,7 +89,7 @@
     <PreferenceScreen
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:title="@string/pref_filters_label"
+        android:title="@string/pref_filters_wspr_label"
         android:key="@string/pref_filters_key" >
 
         <CheckBoxPreference
@@ -96,6 +98,19 @@
             android:summaryOff="@string/pref_filter_enable_false"
             android:summaryOn="@string/pref_filter_enable_true"
             android:defaultValue="@string/pref_filter_enable_default" />
+
+        <com.glandorf1.joe.wsprnetviewer.app.ListPreferenceMultiSelect
+            android:defaultValue=""
+            android:entries="@array/pref_notify_band_options"
+            android:entryValues="@array/pref_notify_band_values"
+            android:key="@string/pref_filter_band_key"
+            android:summary="@string/pref_notify_band_label"
+            android:title="@string/pref_notify_band_label" />
+
+        <PreferenceCategory
+            android:title=" "
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            >
 
         <CheckBoxPreference
             android:title="@string/pref_filter_label_match_all"
@@ -128,6 +143,7 @@
             android:key="@string/pref_filter_key_rx_gridsquare"
             android:summary="@string/pref_filter_summary_rx_callsign"
             android:defaultValue="" />
+        </PreferenceCategory>
     </PreferenceScreen>
 
     <ListPreference

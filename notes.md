@@ -5,7 +5,8 @@
     ```xml
     <!-- uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /-->
     ```
-3.  Increment versionCode and versionName in both `app\build.gradle` and `app\src\main\AndroidManifest.xml`
+3.  Increment versionCode and versionName in both `app\build.gradle` and `app\src\main\AndroidManifest.xml`</br>
+    For beta versions, add a suffix 'beta#' to versionName:  `versionName="0.17beta1"`
 4.  Build...Generate signed APK.
 5.  Test the Release version.
 6.  Add a sanitized version of the commit message to `versions.txt`:

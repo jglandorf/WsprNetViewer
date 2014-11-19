@@ -1,0 +1,54 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.glandorf1.joe.wsprnetviewer.app.PropagationMapsFiltersWavelengthDialog">
+
+        <LinearLayout
+            android:id="@+id/propagation_maps_filter_wavelength"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- This controls the same maps filter enable as on the filter dialog! -->
+            <CheckBox
+                android:id="@+id/propagation_maps_filter_wavelength_enable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:paddingTop="4dip"
+                android:tag="@string/pref_filter_map_enable_key"
+                android:text="@string/pref_filter_enable_label"
+                android:textAppearance="?android:textAppearanceLarge" />
+
+            <View style="@style/Divider" />
+            <View style="@style/Divider" />
+
+            <CheckBox
+                android:id="@+id/propagation_maps_filter_wavelength_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:padding="4dip"
+                android:text="@string/string_select_all"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+                />
+
+            <CheckBox
+                android:id="@+id/propagation_maps_filter_wavelength_none"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:focusable="true"
+                android:padding="4dip"
+                android:text="@string/string_select_none"
+                android:textAppearance="?android:textAppearanceLarge"
+                android:layout_toRightOf="@id/propagation_maps_filter_wavelength_all"
+                />
+
+
+        </LinearLayout>
+
+</ScrollView>
+

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:padding="2dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:id="@+id/wspr_map_marker_image"
+        android:layout_width="50dp"
+        android:layout_height="50dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:background="@color/wspr_light_blue"
+        android:paddingLeft="2dp"
+        android:paddingRight="2dp"
+        android:layout_gravity="center"
+        android:alpha=".4"
+        android:text="info" />
+</FrameLayout>

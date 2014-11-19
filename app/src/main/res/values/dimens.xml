@@ -2,4 +2,6 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="wspr_map_marker_image_dimen">32dp</dimen>
+    <dimen name="wspr_map_marker_image_padding">0dp</dimen>
 </resources>
