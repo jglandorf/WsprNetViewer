@@ -507,6 +507,27 @@ public class Utility {
     }
 
     /**
+     * Returns the maximum # of items to display on the map, or -1 if no limit.
+     */
+    public static int getMaxMapItems(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        // TODO: clean up magic numbers with respect to max # of map items.
+        boolean bAll, b50, b250;
+        bAll = prefs.getBoolean(context.getString(R.string.pref_maps_settings_key_max_items_all), false);
+        b50  = prefs.getBoolean(context.getString(R.string.pref_maps_settings_key_max_items_50), false);
+        b250 = prefs.getBoolean(context.getString(R.string.pref_maps_settings_key_max_items_250), false);
+        if (bAll) {
+            return -1;
+        } else if (b250) {
+            return 250;
+        } else if (b50) {
+            return 50;
+        } else {
+            return 250;
+        }
+    }
+
+    /**
      * Returns true if metric unit should be used, or false if
      * english units should be used.
      */

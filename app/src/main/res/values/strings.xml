@@ -188,6 +188,10 @@
     <string name="pref_maps_settings_markers_label" >Markers</string>
     <string name="string_tx">TX</string>
     <string name="string_rx">RX</string>
+    <string name="pref_maps_settings_label_max_items">Max items:</string>
+    <string name="pref_maps_settings_key_max_items_all">pref_maps_settings_key_max_items_all</string>
+    <string name="pref_maps_settings_key_max_items_50">pref_maps_settings_key_max_items_50</string>
+    <string name="pref_maps_settings_key_max_items_250">pref_maps_settings_key_max_items_250</string>
 
     <!-- wsprnet.org/olddb permits queries -->
     <string name="url_wsprnet_spots_old_base" formatted="false">http://wsprnet.org/olddb</string>
@@ -322,6 +326,5 @@
     <string name="sync_account_type">wsprnetviewer.joe.glandorf1.com</string>
     <string name="content_authority">"com.glandorf1.joe.wsprnetviewer.app"</string>
     <string name="title_activity_propagation_maps">Propagation</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

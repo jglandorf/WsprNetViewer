@@ -17,6 +17,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayout;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -28,7 +29,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -273,6 +273,7 @@ public class PropagationMapsFragment extends Fragment
         String sortOrder = WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " DESC";
         String mSelection = "", mSelectionBand = "";
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        Integer maxItems = Utility.getMaxMapItems(getActivity());
         mFiltered = prefs.getBoolean(getActivity().getString(R.string.pref_filter_map_enable_key),
                 Boolean.parseBoolean(getActivity().getString(R.string.pref_filter_enable_default)));
         if (mFiltered) {
@@ -288,6 +289,12 @@ public class PropagationMapsFragment extends Fragment
                 // Remind user that items are filtered, in case the result is not what they expect.
                 Toast.makeText(getActivity(), getActivity().getString(R.string.toast_filter_items), Toast.LENGTH_SHORT).show();
             }
+        }
+        if (maxItems > 0) {
+            // TODO: some sources (http://stackoverflow.com/questions/12476302/limit-the-query-in-cursorloader)
+            //       suggest using the ORDER clause is a hack, and that the SELECT clause is better.  Couldn't
+            //       get it working with the SELECT clause, though.
+            sortOrder += " LIMIT " + maxItems.toString();
         }
 
         // Save some of the preferences to detect if they've changed in onResume().
@@ -480,7 +487,7 @@ public class PropagationMapsFragment extends Fragment
                 // Set the preference for all items within the layout.
                 String s = ((CheckBox) view).getText().toString();
                 boolean all = s.equals(getResources().getString(R.string.string_select_all));
-                LinearLayout layout = (LinearLayout) view.getParent();
+                GridLayout layout = (GridLayout) view.getParent();
                 for (int i = 0; i < layout.getChildCount(); i++) {
                     View child = layout.getChildAt(i);
                     if (child instanceof CheckBox) {

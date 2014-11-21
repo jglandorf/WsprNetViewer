@@ -368,11 +368,10 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         double minSNR  = Utility.getNotifyMinSNR(context);
         double notifyBandMHz = Utility.getNotifyBand(context),
                notifyBandMHzMin = notifyBandMHz - 0.001, notifyBandMHzMax = notifyBandMHz + 0.001;
-        if (notifyBandMHz < 0.00001) {
+        if (notifyBandMHz < 0.00001) { // zero is a placeholder menu option for 'any'
             notifyBandMHzMin = 0;
             notifyBandMHzMax = 1e300;
         }
-        String bandName = "";
         mBandNameIdx = -1; // reset which band was found for notification
         int nHits = 0, nHitsSnr = 0, nHitsBand = 0, nHitsDistance = 0, nHitsTxCall = 0, nHitsRxCall = 0, nHitsTxGrid = 0, nHitsRxGrid = 0;
         double notifyMinTxRxKm = Utility.getNotifyTxRxKm(context);
@@ -434,14 +433,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
             long locationID = addGridsquare(context, gridsquareSetting, cityName, countryName, cityLatitude, cityLongitude);
             Elements wsprHeader, wsprHeader1, wsprHeader2; // TODO: someday, match up header name instead of relying on a fixed column #
             Elements wsprData;
-            if (drupal == true) {
-                wsprHeader = wsprHtml.select("div#block-system-main.block.block-system div.content table tbody tr:eq(0)");
-                wsprData = wsprHtml.select("div#block-system-main.block.block-system div.content table tbody tr:gt(0)");
-            } else {
-                wsprHeader1 = wsprHtml.select("html body table tbody tr:eq(0)");
-                wsprHeader2 = wsprHtml.select("html body table tbody tr:eq(1)");
-                wsprData   = wsprHtml.select("html body table tbody tr:gt(1)");
-            }
+            wsprData = getWsprData(wsprHtml, drupal);
 
             // Get and insert the new wspr information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(wsprData.size());
@@ -546,15 +538,20 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                         rxCallOk = !rxCallEna || rxCallsign.matches(notifyRxCallsign);
                         txGridOk = !txGridEna || txGridsquare.toUpperCase().matches(notifyTxGridsquare);
                         rxGridOk = !rxGridEna || rxGridsquare.toUpperCase().matches(notifyRxGridsquare);
-                        if (bandOk && snrOk && distanceOk && txCallOk && rxCallOk && txGridOk && rxGridOk) {
+                        // TODO:  is the Java compiler inlining this?  It's in a loop processing lots of data!
+                        if (checkNotifyConditions(bandOk, snrOk, distanceOk, txCallOk, rxCallOk, txGridOk, rxGridOk)) {
                             nHits++;
-                            nHitsBand += (bandEna && bandOk) ? 1 : 0;
-                            nHitsSnr += (snrEna && snrOk) ? 1 : 0;
-                            nHitsDistance += (distanceEna && distanceOk) ? 1 : 0;
-                            nHitsTxCall += (txCallEna && txCallOk) ? 1 : 0;
-                            nHitsRxCall += (rxCallEna && rxCallOk) ? 1 : 0;
-                            nHitsTxGrid += (txGridEna && txGridEna) ? 1 : 0;
-                            nHitsRxGrid += (rxGridEna && rxGridEna) ? 1 : 0;
+                            // This used to read, e.g.,
+                            //   nHitsBand += (bandEna && bandOk) ? 1 : 0;
+                            // This reduces the cyclomatic complexity.
+                            // TODO:  is the Java compiler inlining this?  It's in a loop processing lots of data!
+                            nHitsBand += convertBooleanANDPairToInt(bandEna, bandOk);
+                            nHitsSnr += convertBooleanANDPairToInt(snrEna, snrOk);
+                            nHitsDistance += convertBooleanANDPairToInt(distanceEna, distanceOk);
+                            nHitsTxCall += convertBooleanANDPairToInt(txCallEna, txCallOk);
+                            nHitsRxCall += convertBooleanANDPairToInt(rxCallEna, rxCallOk);
+                            nHitsTxGrid += convertBooleanANDPairToInt(txGridEna, txGridEna);
+                            nHitsRxGrid += convertBooleanANDPairToInt(rxGridEna, rxGridEna);
                         }
                     }
                 } catch (Exception e) {
@@ -582,29 +579,13 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Did any reports meet the notification criteria?
             if (nHits > 0) {
+                String bandName = "";
                 String description = "";
-                if (notifyBandMHz < 0.00001) {
-                    bandName = "---";
-                } else {
-                    bandName = getFrequencyBandName(context, mBandNameIdx);
-                    //description += context.getString(R.string.band_open) + ":";
-                }
-                if (nHitsTxCall > 0) {
-                    description += " " + context.getString(R.string.pref_filter_label_tx_callsign) + "=" + displayTxCallsign + ";";
-                }
-                if (nHitsRxCall > 0) {
-                    description += " " + context.getString(R.string.pref_filter_label_rx_callsign) + "=" + displayRxCallsign + ";";
-                }
-                if (nHitsTxGrid > 0) {
-                    description += " " + context.getString(R.string.pref_filter_label_tx_gridsquare) + "=" + displayTxGridsquare + ";";
-                }
-                if (nHitsRxGrid > 0) {
-                    description += " " + context.getString(R.string.pref_filter_label_rx_gridsquare) + "=" + displayRxGridsquare + ";";
-                }
-                if (nHitsDistance > 0) {
-                    // TODO: Display either km or miles.  See SettingsActivity.java, onPreferenceChange().
-                    description += " distance>=" + Utility.formatDistance(context, notifyMinTxRxKm, Utility.isMetric(context) ) + "km;";
-                }
+                description = createNotifyDescription(context, notifyMinTxRxKm,
+                                nHitsTxCall, nHitsRxCall, nHitsTxGrid, nHitsRxGrid, nHitsDistance,
+                                displayTxCallsign, displayRxCallsign,
+                                displayTxGridsquare, displayRxGridsquare);
+                bandName = createNotifyBandName(context, notifyBandMHz);
                 notifyWspr(context, bandName, description, minSNR);
             }
 
@@ -614,7 +595,67 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     } // getWsprDataFromTags()
 
+    private boolean checkNotifyConditions(boolean bandOk, boolean snrOk, boolean distanceOk,
+                                          boolean txCallOk, boolean rxCallOk, boolean txGridOk,
+                                          boolean rxGridOk) {
+        return bandOk && snrOk && distanceOk && txCallOk && rxCallOk && txGridOk && rxGridOk;
+    }
 
+    private String createNotifyBandName(Context context, double notifyBandMHz) {
+        String bandName;
+        if (notifyBandMHz < 0.00001) {
+            bandName = "---";
+        } else {
+            bandName = getFrequencyBandName(context, mBandNameIdx);
+        }
+        return bandName;
+    }
+
+    private String createNotifyDescription(Context context, double notifyMinTxRxKm,
+                                           int nHitsTxCall, int nHitsRxCall,
+                                           int nHitsTxGrid, int nHitsRxGrid, int nHitsDistance,
+                                           String displayTxCallsign, String displayRxCallsign,
+                                           String displayTxGridsquare, String displayRxGridsquare) {
+        String description = "";
+
+        if (nHitsTxCall > 0) {
+            description += " " + context.getString(R.string.pref_filter_label_tx_callsign) + "=" + displayTxCallsign + ";";
+        }
+        if (nHitsRxCall > 0) {
+            description += " " + context.getString(R.string.pref_filter_label_rx_callsign) + "=" + displayRxCallsign + ";";
+        }
+        if (nHitsTxGrid > 0) {
+            description += " " + context.getString(R.string.pref_filter_label_tx_gridsquare) + "=" + displayTxGridsquare + ";";
+        }
+        if (nHitsRxGrid > 0) {
+            description += " " + context.getString(R.string.pref_filter_label_rx_gridsquare) + "=" + displayRxGridsquare + ";";
+        }
+        if (nHitsDistance > 0) {
+            // TODO: Display either km or miles.  See SettingsActivity.java, onPreferenceChange().
+            description += " distance>=" + Utility.formatDistance(context, notifyMinTxRxKm, Utility.isMetric(context) ) + "km;";
+        }
+        return description;
+    }
+
+    // Extract the WSPR data elements from the HTML page.
+    private Elements getWsprData(Document wsprHtml, boolean drupal) {
+    Elements wsprData;
+    if (drupal == true) {
+        //wsprHeader = wsprHtml.select("div#block-system-main.block.block-system div.content table tbody tr:eq(0)"); // examine the header
+        wsprData = wsprHtml.select("div#block-system-main.block.block-system div.content table tbody tr:gt(0)");
+    } else {
+        //wsprHeader1 = wsprHtml.select("html body table tbody tr:eq(0)"); // examine the header, first row
+        //wsprHeader2 = wsprHtml.select("html body table tbody tr:eq(1)"); // examine the header, second row
+        wsprData   = wsprHtml.select("html body table tbody tr:gt(1)");  // remaining rows
+    }
+    return wsprData;
+}
+
+    // Converts boolean AND to: false=0, true=1
+    // Trivial method to reduce cyclomatic complexity.
+    private int convertBooleanANDPairToInt(boolean b1, boolean b2) {
+        return (b1 && b2) ? 1 : 0;
+    }
     // Make a notification to the user about propagation conditions; they'll want to get on the air now!
     // Notifications must be enabled in the user preferences, and don't notify any more often than
     // specified in the preferences (the "discard data after ..." cutoff value does double duty.)

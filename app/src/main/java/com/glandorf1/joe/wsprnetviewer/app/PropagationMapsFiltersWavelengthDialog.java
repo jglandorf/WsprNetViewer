@@ -9,12 +9,12 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+import android.support.v7.widget.GridLayout;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
@@ -41,7 +41,7 @@ public class PropagationMapsFiltersWavelengthDialog extends DialogFragment {
     private OnPropagationMapFiltersWavelengthListenerTextView mListenerTextView;
     private OnPropagationMapFiltersWavelengthListenerDismiss mListenerDismiss;
     private CheckBox cbEnableFilter, cbFilterWavelengthAll, cbFilterWavelengthNone;
-    private LinearLayout checkboxLayout;
+    private GridLayout checkboxLayout;
 
     /**
      * Use this factory method to create a new instance of
@@ -81,7 +81,7 @@ public class PropagationMapsFiltersWavelengthDialog extends DialogFragment {
         View rootView = inflater.inflate(R.layout.propagation_maps_filters_wavelength_dialog, container, false);
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
         // See http://tonyc9000.blogspot.com/2012/06/android-simple-checkbox-list.html
-        checkboxLayout = (LinearLayout) rootView.findViewById(R.id.propagation_maps_filter_wavelength);
+        checkboxLayout = (GridLayout) rootView.findViewById(R.id.propagation_maps_filter_wavelength_gridView);
         String[] cbWavelengthText, cbWavelengthTags;
         cbWavelengthText = getResources().getStringArray(R.array.pref_notify_band_options);
         cbWavelengthTags = getResources().getStringArray(R.array.pref_notify_band_values);
@@ -102,7 +102,7 @@ public class PropagationMapsFiltersWavelengthDialog extends DialogFragment {
             cb.setLayoutParams(layoutParams);
             cb.setFocusable(true);
             cb.setPadding(0, 0, 4, 0);
-            cb.setTextAppearance(getActivity(), R.style.WsprTextAppearanceLarge);
+            cb.setTextAppearance(getActivity(), R.style.WsprTextAppearanceMedium);
             cb.setText(cbWavelengthText[i]);
             // Tag is the key prefix and option suffix:
             //   "pref_map_band_any"

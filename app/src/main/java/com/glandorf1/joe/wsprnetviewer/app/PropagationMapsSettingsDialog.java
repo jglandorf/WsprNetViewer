@@ -41,6 +41,7 @@ public class PropagationMapsSettingsDialog extends DialogFragment {
     private OnPropagationMapSettingsListenerTextView mListenerTextView;
     private OnPropagationMapSettingsListenerDismiss mListenerDismiss;
     private RadioButton rbMapHeatSetting, rbMapGreatCircle;
+    private RadioButton rbMaxItemsAll, rbMaxItems50, rbMaxItems250;
     private RadioGroup rgMapTypes;
     CheckBox cbEnableMarkersTx, cbEnableMarkersRx;
     //private EditText mEditTextTxCallsign, mEditTextRxCallsign, mEditTextTxGridsquare, mEditTextRxGridsquare;
@@ -100,6 +101,16 @@ public class PropagationMapsSettingsDialog extends DialogFragment {
         cbEnableMarkersRx.setOnClickListener(onClick);
         cbEnableMarkersRx.setChecked(prefs.getBoolean(cbEnableMarkersRx.getTag().toString(), false));
 
+        // TODO: clean up magic numbers with respect to max # of map items.
+        rbMaxItemsAll = (RadioButton) rootView.findViewById(R.id.propagation_maps_settings_max_items_all);
+        rbMaxItems50  = (RadioButton) rootView.findViewById(R.id.propagation_maps_settings_max_items_50);
+        rbMaxItems250 = (RadioButton) rootView.findViewById(R.id.propagation_maps_settings_max_items_250);
+        rbMaxItemsAll.setChecked(prefs.getBoolean(rbMaxItemsAll.getTag().toString(), false));
+        rbMaxItems50.setChecked(prefs.getBoolean(rbMaxItems50.getTag().toString(), false));
+        rbMaxItems250.setChecked(prefs.getBoolean(rbMaxItems250.getTag().toString(), true));
+        rbMaxItemsAll.setOnClickListener(onClick);
+        rbMaxItems50.setOnClickListener(onClick);
+        rbMaxItems250.setOnClickListener(onClick);
         return rootView;
     }
 
