@@ -73,6 +73,7 @@ public class PropagationMapsFragment extends Fragment
     private static final int MAPS_LOADER = 1;
     private String mGridsquare, mFilterTxCallsign, mFilterRxCallsign, mFilterTxGridsquare, mFilterRxGridsquare;
     private boolean mFilterAnd, mFiltered;
+    private int mMaxItems = -1, mMaxTimeAgoSeconds = -1;
     protected boolean needLoaderRestart = false, needMapRedraw = false;
     private static int mLastNumItems = -1;
     private boolean mIsVisible = false;
@@ -161,6 +162,8 @@ public class PropagationMapsFragment extends Fragment
                 || (mFilterAnd != prefs.getBoolean(getActivity().getString(R.string.pref_filter_map_key_match_all), Boolean.parseBoolean(getActivity().getString(R.string.pref_filter_match_all_default))))
         )
                 || (mFiltered != prefs.getBoolean(getActivity().getString(R.string.pref_filter_map_enable_key), Boolean.parseBoolean(getActivity().getString(R.string.pref_filter_enable_default)))) // or filter on/off has changed
+                || (mMaxItems != Utility.getMaxMapItems(getActivity())) // or max items has changed
+                || (mMaxTimeAgoSeconds != Utility.getMaxMapTimeAgoSeconds(getActivity())) // or cutoff time has changed
                 ) {
             mLastNumItems = -1; // reset so that notification will appear
             getLoaderManager().restartLoader(MAPS_LOADER, null, this);
@@ -271,30 +274,39 @@ public class PropagationMapsFragment extends Fragment
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         String sortOrder = WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " DESC";
-        String mSelection = "", mSelectionBand = "";
+        String selection = "", selectionBand = "";
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        Integer maxItems = Utility.getMaxMapItems(getActivity());
+        mMaxItems = Utility.getMaxMapItems(getActivity());
+        mMaxTimeAgoSeconds = Utility.getMaxMapTimeAgoSeconds(getActivity());
         mFiltered = prefs.getBoolean(getActivity().getString(R.string.pref_filter_map_enable_key),
-                Boolean.parseBoolean(getActivity().getString(R.string.pref_filter_enable_default)));
+                                     Boolean.parseBoolean(getActivity().getString(R.string.pref_filter_enable_default)));
         if (mFiltered) {
-            mSelection = Utility.getMapsFilterSelectionStringForSql(getActivity());
-            mSelectionBand = Utility.getFilterBandSelectionStringForSql(getActivity(), 5., false);
-            if (mSelectionBand.length() > 0) {
-                if (mSelection.length() > 0) {
-                    mSelection += " and ";
+            selection = Utility.getMapsFilterSelectionStringForSql(getActivity());
+            selectionBand = Utility.getFilterBandSelectionStringForSql(getActivity(), 5., false);
+            if (selectionBand.length() > 0) {
+                if (selection.length() > 0) {
+                    selection += " and ";
                 }
-                mSelection += mSelectionBand;
+                selection += selectionBand;
             }
-            if (mIsVisible && (mSelection.length() > 0)) {
+            if (mIsVisible && (selection.length() > 0)) {
                 // Remind user that items are filtered, in case the result is not what they expect.
                 Toast.makeText(getActivity(), getActivity().getString(R.string.toast_filter_items), Toast.LENGTH_SHORT).show();
             }
         }
-        if (maxItems > 0) {
+        if (mMaxItems > 0) {
+            Integer maxItems = mMaxItems;
             // TODO: some sources (http://stackoverflow.com/questions/12476302/limit-the-query-in-cursorloader)
             //       suggest using the ORDER clause is a hack, and that the SELECT clause is better.  Couldn't
             //       get it working with the SELECT clause, though.
             sortOrder += " LIMIT " + maxItems.toString();
+        }
+        if (mMaxTimeAgoSeconds > 0) {
+            String selectionTimeAgo = Utility.getMaxMapTimeAgoSelectionStringForSql(getActivity(), mMaxTimeAgoSeconds);
+            if (selection.length() > 0) {
+                selection += " and ";
+            }
+            selection += selectionTimeAgo;
         }
 
         // Save some of the preferences to detect if they've changed in onResume().
@@ -314,7 +326,7 @@ public class PropagationMapsFragment extends Fragment
                 getActivity(), // context
                 wsprUri,       // URI
                 WsprFragment.WSPR_COLUMNS,  // String[] projection
-                mSelection,    // String selection
+                selection,    // String selection
                 null,          // String[] selectionArgs
                 sortOrder      // String sortOrder
         );
@@ -358,6 +370,10 @@ public class PropagationMapsFragment extends Fragment
             boolean mapMarkersTxEnable = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_markers_tx_key), false);
             boolean mapMarkersRxEnable = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_markers_rx_key), false);
             boolean isMetric = Utility.isMetric(getActivity());
+            boolean mapIntensityRxSnr = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_intensity_snr),
+                    true);
+            boolean mapIntensitySnrMinusDbm = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_intensity_snr_minus_tx_power),
+                    false);
 
             // It seems to be much faster to clear the map entirely than to remove the overlay or polylines.
             mMap.clear();
@@ -373,15 +389,28 @@ public class PropagationMapsFragment extends Fragment
                 cursor.moveToPosition(-1);
                 // Create a weighted latitude longitude list
                 while (cursor.moveToNext()) {
-                    double latRx = 0, lngRx = 0, txdbm = 0.;
+                    double latRx = 0, lngRx = 0, rxsnr = 0., txdbm = 0., intensity = 0.;
                     String txgridsquare = cursor.getString(WsprFragment.COL_WSPR_TX_GRIDSQUARE);
                     double latTx = Utility.gridsquareToLatitude(txgridsquare);
                     double lngTx = Utility.gridsquareToLongitude(txgridsquare);
-                    double rxsnr = cursor.getDouble(WsprFragment.COL_WSPR_RX_SNR);
+                    rxsnr = cursor.getDouble(WsprFragment.COL_WSPR_RX_SNR);
                     txdbm = cursor.getDouble(WsprFragment.COL_WSPR_TX_POWER);
+                    // Summary of TX power for the first 1048575 spots in 2014-09
+                    //           TX power        TX power
+                    //            dBm             watts
+                    // min        -33             5.01187E-07
+                    // max         63          1995.262315
+                    // avg         31.89159764    1.545822999
+                    // std dev      6.96339440    7.682440496
+                    // avg-std dev 24.92820324    0.311042922
+                    // avg+std dev 38.85499205    7.682440496
+                    intensity = rxsnr;
+                    if (mapIntensitySnrMinusDbm) {
+                        intensity = rxsnr - txdbm;
+                    }
                     if (mapTypeHeat) {
                         // TODO: determine if we should display rxsnr or (rxsnr - txdbm).
-                        latLngList.add(new WeightedLatLng(new LatLng(latTx, lngTx), (rxsnr - txdbm)));
+                        latLngList.add(new WeightedLatLng(new LatLng(latTx, lngTx), intensity));
                     }
                     if (mapTypeGreatCircle || mapMarkersTxEnable || mapMarkersRxEnable) {
                         String rxgridsquare = cursor.getString(WsprFragment.COL_WSPR_RX_GRIDSQUARE);
@@ -390,13 +419,13 @@ public class PropagationMapsFragment extends Fragment
                     }
                     if (mapTypeGreatCircle) {
                         // convert snr range of -30 to +20 to saturation of 0.5 to +1.
-                        rxsnr = rxsnr < -30. ? -30. : rxsnr;
-                        rxsnr = rxsnr > +20. ? +20. : rxsnr;
-                        greatCircleHSV[1] = (float) ((rxsnr + 80) / 100.);
+                        intensity = intensity < -30. ? -30. : intensity;
+                        intensity = intensity > +20. ? +20. : intensity;
+                        greatCircleHSV[1] = (float) ((intensity + 80) / 100.);
                         // There may not be alpha support in early Android versions;
                         //   Build.VERSION.SDK_INT == 10 for GINGERBREAD_MR1
                         int alpha = (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)?
-                                      (int) (255. * (rxsnr + 40.) / 60.)
+                                      (int) (255. * (intensity + 40.) / 60.)
                                     : 255;
                         polylineList.add(mMap.addPolyline((new PolylineOptions())
                                 .add(new LatLng(latTx, lngTx), new LatLng(latRx, lngRx))
@@ -511,7 +540,7 @@ public class PropagationMapsFragment extends Fragment
     //    @Override
     public boolean onPropagationMapFiltersTextView(TextView textview, int actionId, KeyEvent keyEvent) {
         boolean handled = false;
-        if (actionId == EditorInfo.IME_ACTION_DONE) {
+        if (actionId == EditorInfo.IME_ACTION_DONE) { // click= 'done', long-click= 'next'
             if (textview.getClass().getSimpleName().equalsIgnoreCase("EditText")) {
                 EditText et = (EditText) textview;
                 SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
@@ -523,6 +552,20 @@ public class PropagationMapsFragment extends Fragment
             needLoaderRestart = true;
         }
         return handled;
+    }
+
+    public void onPropagationMapFiltersListenerViewFocusChange(View view, boolean b) {
+        // Use this routine for debugging.  Unfortunately, a focus change event doesn't occur when dialog is dismissed.
+//        if (view instanceof EditText) {
+//            if (b) {
+//                TextView t = (TextView) view;
+//                String text = t.getText().toString();
+//                Log.v(LOG_TAG, "onPropagationMapFiltersListenerViewFocusChange:  '" + text + "'");
+//                //onPropagationMapFiltersTextView(t, EditorInfo.IME_ACTION_DONE, null);
+//                //needLoaderRestart = true; // temporary-- only way, for now, to redraw map is to restart loader
+//                //needMapRedraw = true;
+//            }
+//        }
     }
 
     //    @Override
@@ -762,7 +805,7 @@ public class PropagationMapsFragment extends Fragment
             //    0 (zoom out) <= level <= 21 (zoom in)
             if (mMapZoomLevel < (mMapZoomLevelMax - 8)) {
                 // Always render clusters.
-                return cluster.getSize() > 1;
+                return cluster.getSize() >= 3;
             } else {
                 return false;
             }

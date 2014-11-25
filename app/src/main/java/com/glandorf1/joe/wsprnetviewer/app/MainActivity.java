@@ -41,6 +41,7 @@ public class MainActivity extends ActionBarActivity
         PropagationMapsFiltersDialog.OnPropagationMapFiltersListenerView,
         PropagationMapsFiltersDialog.OnPropagationMapFiltersListenerTextView,
         PropagationMapsFiltersDialog.OnPropagationMapFiltersListenerDismiss,
+        PropagationMapsFiltersDialog.OnPropagationMapFiltersListenerViewFocusChange,
         PropagationMapsSettingsDialog.OnPropagationMapSettingsListenerView,
         PropagationMapsSettingsDialog.OnPropagationMapSettingsListenerTextView,
         PropagationMapsSettingsDialog.OnPropagationMapSettingsListenerDismiss,
@@ -257,6 +258,14 @@ public class MainActivity extends ActionBarActivity
             PropagationMapsFragment mapsFragment = (PropagationMapsFragment)mCurrentFragment;
             if (mapsFragment != null) {
                 mapsFragment.onPropagationMapFiltersListenerDismiss();
+            }
+        }
+
+        @Override
+        public void onPropagationMapFiltersListenerViewFocusChange(View view, boolean b) {
+            PropagationMapsFragment mapsFragment = (PropagationMapsFragment)mCurrentFragment;
+            if (mapsFragment != null) {
+                mapsFragment.onPropagationMapFiltersListenerViewFocusChange(view, b);
             }
         }
 

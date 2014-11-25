@@ -528,6 +528,52 @@ public class Utility {
     }
 
     /**
+     * Returns the max number of seconds for a 'recent' map item, in seconds, or -1 if no limit.
+     */
+    public static int getMaxMapTimeAgoSeconds(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        // TODO: clean up magic numbers with respect to max # of map items.
+        boolean bAll, bShort, bLong;
+        int timeAgoSeconds = -1;
+        bAll = prefs.getBoolean(context.getString(R.string.pref_maps_settings_key_max_minutes_ago_all), false);
+        bShort  = prefs.getBoolean(context.getString(R.string.pref_maps_settings_key_max_minutes_ago_short), false);
+        bLong = prefs.getBoolean(context.getString(R.string.pref_maps_settings_key_max_minutes_ago_long), false);
+        if (bAll) {
+            timeAgoSeconds = -1;
+        } else if (bLong) {
+            timeAgoSeconds = Integer.parseInt(context.getString(R.string.pref_maps_settings_default_max_minutes_ago_long)) * 60; // minutes -> seconds
+        } else if (bShort) {
+            timeAgoSeconds = Integer.parseInt(context.getString(R.string.pref_maps_settings_default_max_minutes_ago_short)) * 60; // minutes -> seconds
+        } else {
+            timeAgoSeconds = -1;
+        }
+        return timeAgoSeconds;
+    }
+
+    /**
+     * Returns the SQLite selection string to limit the map display to recent items, or "" if no limit.
+     * Requires that the map time ago seconds be passed in; this is obtained from getMaxMapTimeAgoSeconds().
+     */
+    public static String getMaxMapTimeAgoSelectionStringForSql(Context context, int timeAgoSeconds) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        String selection = "";
+        if (timeAgoSeconds <= 0) {
+            return selection;
+        }
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(new Date());
+        TimeZone tz = TimeZone.getDefault();
+        int offsetUTC = tz.getOffset(cal.getTimeInMillis()) / 1000;
+        cal.add(Calendar.SECOND, -offsetUTC);
+        cal.add(Calendar.SECOND, -timeAgoSeconds);
+        String cutoffTimestamp = WsprNetContract.getDbTimestampString(cal.getTime());
+        // timestamp in database looks like: '20141021141400000'.
+        selection = "(" + WsprNetContract.SignalReportEntry.COLUMN_TIMESTAMPTEXT + " >= " + cutoffTimestamp + ")";
+        return selection;
+    }
+
+    /**
      * Returns true if metric unit should be used, or false if
      * english units should be used.
      */

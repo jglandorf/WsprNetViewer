@@ -5,8 +5,8 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.glandorf1.joe.wsprnetviewer.app"
-    android:versionCode="8"
-    android:versionName="0.17beta1" >
+    android:versionCode="9"
+    android:versionName="0.17beta2" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />

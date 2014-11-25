@@ -39,6 +39,7 @@ public class PropagationMapsFiltersDialog extends DialogFragment {
     private OnPropagationMapFiltersListenerView mListenerView;
     private OnPropagationMapFiltersListenerTextView mListenerTextView;
     private OnPropagationMapFiltersListenerDismiss mListenerDismiss;
+    private OnPropagationMapFiltersListenerViewFocusChange mListenerFocusChange;
     private CheckBox cbEnableFilter, cbMatchAll;
     private EditText mEditTextTxCallsign, mEditTextRxCallsign, mEditTextTxGridsquare, mEditTextRxGridsquare;
 
@@ -90,6 +91,7 @@ public class PropagationMapsFiltersDialog extends DialogFragment {
 
         mEditTextTxCallsign = (EditText) rootView.findViewById(R.id.propagation_maps_filter_tx_callsign);
         mEditTextTxCallsign.setOnEditorActionListener(onEditorAction);
+        mEditTextTxCallsign.setOnFocusChangeListener(onFocusChange);
         mEditTextTxCallsign.setText(prefs.getString(mEditTextTxCallsign.getTag().toString(), ""));
         //mEditTextTxCallsign.setImeOptions(EditorInfo.IME_ACTION_DONE); // this is how to set it programmatically
 
@@ -130,6 +132,14 @@ public class PropagationMapsFiltersDialog extends DialogFragment {
             return false;
         }
     };
+    View.OnFocusChangeListener onFocusChange = new View.OnFocusChangeListener() {
+        @Override
+        public void onFocusChange(View view, boolean b) {
+            if (mListenerFocusChange != null) {
+                mListenerFocusChange.onPropagationMapFiltersListenerViewFocusChange(view, b);
+            }
+        }
+    };
 
 
     public void onAttach(Activity activity) {
@@ -149,6 +159,11 @@ public class PropagationMapsFiltersDialog extends DialogFragment {
             mListenerDismiss = (OnPropagationMapFiltersListenerDismiss) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnPropagationMapFiltersListenerDismiss");
+        }
+        try {
+            mListenerFocusChange = (OnPropagationMapFiltersListenerViewFocusChange) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement OnPropagationMapFiltersListenerViewFocusChange");
         }
     }
 
@@ -188,5 +203,8 @@ public class PropagationMapsFiltersDialog extends DialogFragment {
     }
     public interface OnPropagationMapFiltersListenerDismiss {
         public void onPropagationMapFiltersListenerDismiss();
+    }
+    public interface OnPropagationMapFiltersListenerViewFocusChange {
+        public void onPropagationMapFiltersListenerViewFocusChange(View view, boolean b);
     }
 }

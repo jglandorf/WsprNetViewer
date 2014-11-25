@@ -40,8 +40,9 @@ public class PropagationMapsSettingsDialog extends DialogFragment {
     private OnPropagationMapSettingsListenerView mListenerView;
     private OnPropagationMapSettingsListenerTextView mListenerTextView;
     private OnPropagationMapSettingsListenerDismiss mListenerDismiss;
-    private RadioButton rbMapHeatSetting, rbMapGreatCircle;
+    private RadioButton rbMapHeatSetting, rbMapGreatCircle, rbSnr, rbSnrMinusTxDbm;
     private RadioButton rbMaxItemsAll, rbMaxItems50, rbMaxItems250;
+    private RadioButton rbMaxMinutesAgoAll, rbMaxMinutesAgoShort, rbMaxMinutesAgoLong;
     private RadioGroup rgMapTypes;
     CheckBox cbEnableMarkersTx, cbEnableMarkersRx;
     //private EditText mEditTextTxCallsign, mEditTextRxCallsign, mEditTextTxGridsquare, mEditTextRxGridsquare;
@@ -94,6 +95,13 @@ public class PropagationMapsSettingsDialog extends DialogFragment {
         rbMapGreatCircle.setChecked(prefs.getBoolean(rbMapGreatCircle.getTag().toString(),
                 Boolean.parseBoolean(getActivity().getString(R.string.pref_maps_settings_default_map_type_great_circle))));
 
+        rbSnrMinusTxDbm = (RadioButton) rootView.findViewById(R.id.pref_maps_settings_intensity_snr_minus_tx_power);
+        rbSnrMinusTxDbm.setOnClickListener(onClick);
+        rbSnrMinusTxDbm.setChecked(prefs.getBoolean(rbSnrMinusTxDbm.getTag().toString(), false));
+        rbSnr = (RadioButton) rootView.findViewById(R.id.pref_maps_settings_map_intensity_snr);
+        rbSnr.setOnClickListener(onClick);
+        rbSnr.setChecked(prefs.getBoolean(rbSnr.getTag().toString(), true));
+
         cbEnableMarkersTx = (CheckBox) rootView.findViewById(R.id.propagation_maps_settings_markers_tx);
         cbEnableMarkersTx.setOnClickListener(onClick);
         cbEnableMarkersTx.setChecked(prefs.getBoolean(cbEnableMarkersTx.getTag().toString(), false));
@@ -111,6 +119,17 @@ public class PropagationMapsSettingsDialog extends DialogFragment {
         rbMaxItemsAll.setOnClickListener(onClick);
         rbMaxItems50.setOnClickListener(onClick);
         rbMaxItems250.setOnClickListener(onClick);
+
+        rbMaxMinutesAgoAll = (RadioButton) rootView.findViewById(R.id.propagation_maps_settings_max_minutes_ago_all);
+        rbMaxMinutesAgoShort = (RadioButton) rootView.findViewById(R.id.propagation_maps_settings_max_minutes_ago_short);
+        rbMaxMinutesAgoLong = (RadioButton) rootView.findViewById(R.id.propagation_maps_settings_max_minutes_ago_long);
+        rbMaxMinutesAgoAll.setChecked(prefs.getBoolean(rbMaxMinutesAgoAll.getTag().toString(), false));
+        rbMaxMinutesAgoShort.setChecked(prefs.getBoolean(rbMaxMinutesAgoShort.getTag().toString(), false));
+        rbMaxMinutesAgoLong.setChecked(prefs.getBoolean(rbMaxMinutesAgoLong.getTag().toString(), true));
+        rbMaxMinutesAgoAll.setOnClickListener(onClick);
+        rbMaxMinutesAgoShort.setOnClickListener(onClick);
+        rbMaxMinutesAgoLong.setOnClickListener(onClick);
+
         return rootView;
     }
 

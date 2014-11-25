@@ -4,8 +4,12 @@
 
 ## Synopsis
 WsprNet Viewer is an Android application that periodically retrieves and displays amateur radio ("ham radio") signal propagation reports from http://www.wsprnet.org.  Tapping on a specific report displays more information about it on a details screen, along with  a world map image identifying the  transmitter and receiver locations.  From the detail screen's menu,  you can share the report, or map the transmitter or receiver location using the Android device's map application.  The device can notify you when propagation is reported to be good  for a particular radio frequency band.
-  
-  ![main screen](screenshots/wsprnetViewerScreenSmall7Main.png)
+
+The maps page brings its own set of callsign, grid square, and band filters.  It allows propagation to be visualized as a great circle map, or allows the concentration of WSPR transmitters to be visualized as a heat map.
+To set your home location (QTH), just long-click on the map.  To find your antenna heading to a beacon, just tap the beacon marker, then tap on its popup information.
+
+
+  ![main screen](screenshots/main_page_wspr_annotated_small.png)
   ![details screen](screenshots/wsprnetViewerScreenSmall8Details.png)
   ![details screen map TX](screenshots/wsprnetViewerScreenSmall9DetailsMapTx.png)
   ![notifications screen](screenshots/wsprnetViewerScreenSmall13DetailsMappedTxHiLite.png)
@@ -13,18 +17,32 @@ WsprNet Viewer is an Android application that periodically retrieves and display
   ![notification settings screen](screenshots/wsprnetViewerScreenSmall3NotificationSetup.png)
   ![notifications screen](screenshots/wsprnetViewerScreenSmall5Notification.png)
 
+  ![great circle map](screenshots/map_great_circle_annotated_small.png)
+  ![great circle map with popups](screenshots/map_great_circle_tx_markers_popup_sub-popup_annotated_small.png)
+  ![TX heat map, RX markers](screenshots/map_heat_RX_markers_small.png)
+
+  ![map filters](screenshots/map_filters_small.png)
+  ![map filters band](screenshots/map_filters_band_small.png)
+  ![map settings](screenshots/map_settings_small.png)
+
 ### Background
 How well a radio signal travels ("propagates") is affected by its frequency (e.g., shortwave, VHF, UHF, microwave), distance, path, terrain, and atmospheric conditions between transmitter and receiver.  Radio waves tend to travel in straight lines.  For distances beyond the horizon (over ~20 miles), we might rely on them repeatedly bouncing between the ionosphere or other atmospheric phenomena, "hopping" along to a receiver.  Some aspects of this category of propagation are cyclical (as the sun rises and sets, or per 11-year sunspot cycles), but many are not so predictable and can vary in as little as a few minutes.
 
 It's useful to have an idea of current propagation conditions at various radio frequencies for points around the globe.  A network of amateur radio beacons and receivers exists that continuously track radio propagation; this information is reported to a central website at http://wsprnet.org. 
 
 #### About the Icons
-WSPR receivers include the signal strength in their reports; this is equivalent to the "number of bars" displayed on a phone to indicate cell tower or WiFi signal strength.  To avoid confusion with these icons, WsprNet Viewer uses a hand holding up one to four fingers to indicate a good to poor signal; a clenched fist indicates a very poor signal:
-  - 4 fingers:  over 0dBm ![4 fingers](app/src/main/res/drawable-mdpi/ic_four_fingers.png)
-  - 3 fingers:   -5 to 0dBm ![3 fingers](app/src/main/res/drawable-mdpi/ic_three_fingers.png)
-  - 2 fingers:  -10 to -5dBm ![2 fingers](app/src/main/res/drawable-mdpi/ic_two_fingers.png)
-  - 1 fingers:  -15 to -10dBm ![1 finger](app/src/main/res/drawable-mdpi/ic_one_finger.png)
-  - fist: less than -15dBm ![fist](app/src/main/res/drawable-mdpi/ic_clenched_fist.png)
+WSPR receivers include the signal-to-noise ratio, used here as an indicator of signal strength:
+  - 5 bars:    15dB and over ![5 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_50.png)
+  - 4.5 bars:  10 to 15dB ![4.5 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_45.png)
+  - 4 bars:     5 to 10dB ![4 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_40.png)
+  - 3.5 bars:   0 to 5dB ![3.5 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_35.png)
+  - 3 bars:    -5 to 0dB ![3 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_30.png)
+  - 2.5 bars: -10 to -5dB ![2.5 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_25.png)
+  - 2 bars:   -15 to -10dB ![2 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_20.png)
+  - 1.5 bars: -20 to -15dB ![1.5 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_15.png)
+  - 1 bar:   -25 to -20dB ![1 bar](app/src/main/res/drawable-mdpi/ic_signal_neg_10.png)
+  - 0.5 bar: -30 to -25dB ![0.5 bar](app/src/main/res/drawable-mdpi/ic_signal_neg_05.png)
+  - 0 bars: less then -30dB ![0 bars](app/src/main/res/drawable-mdpi/ic_signal_neg_00.png)
 
 On the Details screen, the transmitter and receiver locations are identified by these icons:
   - Transmitter: ![tx icon](screenshots/wsprnetViewerTxSymbol.png)
@@ -44,8 +62,11 @@ Transmitter and receiver locations are reported and stored in the [Maidenhead Lo
        - `app/installReleaseToDevice.bat` to install the Release version.
 
 ### Dependencies ###
-This project uses the [jsoup](http://jsoup.org) HTML parsing library, which been added as a dependency to `app/build.gradle`. Android Studio will automatically retrieve it from Maven.
-
+This project uses the following libraries:
+ [jsoup](http://jsoup.org),
+ [robotium](robotium.android.jayway.com),
+ [jmockit](jmockit.org).  These are are added as dependencies in `app/build.gradle`; Android Studio will automatically retrieve them from Maven.
+This project also uses [mulsellistprefcompat](https://github.com/h6ah4i/mulsellistprefcompat).
 
 ### Testing and Development
 Development is done on Windows 7 with Android Studio 0.8.6 and 0.8.9.

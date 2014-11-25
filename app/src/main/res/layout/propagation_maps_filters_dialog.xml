@@ -37,6 +37,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/pref_filters_wildcards"
+            android:textColor="@color/wspr_brown"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/string_press_done_on_keyboard"
             android:textColor="@color/wspr_brown"
             android:textStyle="italic" />
@@ -62,6 +69,7 @@
                 android:layout_height="wrap_content"
                 android:focusableInTouchMode="true"
                 android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
                 android:paddingTop="4dip"
                 android:singleLine="true"
                 android:tag="@string/pref_filter_map_key_tx_callsign"
@@ -90,6 +98,7 @@
                 android:layout_height="wrap_content"
                 android:focusableInTouchMode="true"
                 android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
                 android:paddingTop="4dip"
                 android:singleLine="true"
                 android:tag="@string/pref_filter_map_key_rx_callsign"
@@ -118,6 +127,7 @@
                 android:layout_height="wrap_content"
                 android:focusableInTouchMode="true"
                 android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
                 android:paddingTop="4dip"
                 android:singleLine="true"
                 android:tag="@string/pref_filter_map_key_tx_gridsquare"
@@ -146,11 +156,14 @@
                 android:layout_height="wrap_content"
                 android:focusableInTouchMode="true"
                 android:imeOptions="actionDone"
+                android:inputType="textNoSuggestions"
                 android:paddingTop="4dip"
                 android:singleLine="true"
                 android:tag="@string/pref_filter_map_key_rx_gridsquare"
                 android:text="@string/pref_filter_label_rx_gridsquare"
-                android:textAppearance="?android:textAppearanceLarge" />
+                android:textAppearance="?android:textAppearanceLarge"
+                android:nextFocusDown="@id/propagation_maps_filter_tx_callsign"
+                />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

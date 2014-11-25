@@ -129,7 +129,7 @@
     <!-- filtering strings -->
     <string name="string_select_all">All</string>
     <string name="string_select_none">None</string>
-    <string name="string_press_done_on_keyboard">press \'done\' key, then \u21b0 </string>
+    <string name="string_press_done_on_keyboard">long-click \'done\' key, then \u21b0 </string>
     <!-- labels -->
     <string name="pref_filters_label">Filters</string>
     <string name="pref_filters_wspr_label">WSPR Filters</string>
@@ -180,6 +180,13 @@
     <string name="pref_maps_settings_key_map_type_great_circle" translatable="false">pref_maps_settings_key_map_type_great_circle</string>
     <string name="pref_maps_settings_default_map_type_heat" translatable="false">false</string>
     <string name="pref_maps_settings_default_map_type_great_circle" translatable="false">true</string>
+
+    <string name="propagation_maps_settings_label_intensity">Intensity</string>
+    <string name="pref_maps_settings_label_map_intensity_snr">RX SNR</string>
+    <string name="pref_maps_settings_key_map_intensity_snr" translatable="false">pref_maps_settings_key_map_intensity_snr</string>
+    <string name="pref_maps_settings_label_map_intensity_snr_minus_tx_power">RX SNR - TX dBm</string>
+    <string name="pref_maps_settings_key_map_intensity_snr_minus_tx_power" translatable="false">pref_maps_settings_key_map_intensity_snr_minus_tx_power</string>
+
     <string name="propagation_maps_settings_label_map_type">Map type</string>
     <string name="propagation_maps_settings_label_heat">heat map</string>
     <string name="propagation_maps_settings_label_great_circle">great circle map</string>
@@ -192,6 +199,13 @@
     <string name="pref_maps_settings_key_max_items_all">pref_maps_settings_key_max_items_all</string>
     <string name="pref_maps_settings_key_max_items_50">pref_maps_settings_key_max_items_50</string>
     <string name="pref_maps_settings_key_max_items_250">pref_maps_settings_key_max_items_250</string>
+    <string name="pref_maps_settings_label_max_minutes_ago">Max minutes ago:</string>
+    <string name="pref_maps_settings_key_max_minutes_ago_all">pref_maps_settings_key_max_minutes_ago_all</string>
+    <string name="pref_maps_settings_key_max_minutes_ago_short">pref_maps_settings_key_max_minutes_ago_short</string>
+    <string name="pref_maps_settings_key_max_minutes_ago_long">pref_maps_settings_key_max_minutes_ago_long</string>
+    <string name="pref_maps_settings_default_max_minutes_ago_all">-1</string>
+    <string name="pref_maps_settings_default_max_minutes_ago_short">15</string>
+    <string name="pref_maps_settings_default_max_minutes_ago_long">60</string>
 
     <!-- wsprnet.org/olddb permits queries -->
     <string name="url_wsprnet_spots_old_base" formatted="false">http://wsprnet.org/olddb</string>

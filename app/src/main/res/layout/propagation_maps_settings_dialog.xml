@@ -74,6 +74,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/propagation_maps_settings_label_intensity"
+            />
+        <RadioGroup
+            android:id="@+id/pref_maps_settings_map_intensity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <RadioButton
+                android:id="@+id/pref_maps_settings_map_intensity_snr"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pref_maps_settings_label_map_intensity_snr"
+                android:tag="@string/pref_maps_settings_key_map_intensity_snr"
+                android:checked="true"
+                />
+            <RadioButton
+                android:id="@+id/pref_maps_settings_intensity_snr_minus_tx_power"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pref_maps_settings_label_map_intensity_snr_minus_tx_power"
+                android:tag="@string/pref_maps_settings_key_map_intensity_snr_minus_tx_power"
+                android:checked="false"
+                />
+        </RadioGroup>
+        <View style="@style/Divider" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/pref_maps_settings_label_max_items"
             />
         <RadioGroup
@@ -103,6 +133,44 @@
                 android:layout_height="wrap_content"
                 android:text="50"
                 android:tag="@string/pref_maps_settings_key_max_items_50"
+                android:checked="false"
+                />
+        </RadioGroup>
+
+        <View style="@style/Divider" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="@string/pref_maps_settings_label_max_minutes_ago"
+            />
+        <RadioGroup
+            android:id="@+id/propagation_maps_settings_max_minutes_ago"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"  >
+            <RadioButton
+                android:id="@+id/propagation_maps_settings_max_minutes_ago_all"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/string_select_all"
+                android:tag="@string/pref_maps_settings_key_max_minutes_ago_all"
+                android:checked="false"
+                />
+            <RadioButton
+                android:id="@+id/propagation_maps_settings_max_minutes_ago_long"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pref_maps_settings_default_max_minutes_ago_long"
+                android:tag="@string/pref_maps_settings_key_max_minutes_ago_long"
+                android:checked="false"
+                />
+            <RadioButton
+                android:id="@+id/propagation_maps_settings_max_minutes_ago_short"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/pref_maps_settings_default_max_minutes_ago_short"
+                android:tag="@string/pref_maps_settings_key_max_minutes_ago_short"
                 android:checked="false"
                 />
         </RadioGroup>
