@@ -79,7 +79,7 @@ public class PropagationMapsFragment extends Fragment
     private boolean mIsVisible = false;
     Button buttonFilter, buttonWavelength, buttonSettings;
     ImageButton buttonLocate;
-    private int mCountToastSettingsPersonalLocation = 1;
+    private int mCountToastMapsNotAvailable = 2;
     private int mCountToastSettingsQTH = 4;
 
     SupportMapFragment mSupportMapFragment;
@@ -345,152 +345,161 @@ public class PropagationMapsFragment extends Fragment
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         Integer n = (cursor == null) ? 0 : cursor.getCount();
         Log.v(LOG_TAG, "onLoadFinished:  data.getCount()= " + n.toString());
-        if ((n == 0) && (mLastNumItems != 0)) {
-            // only do this once if there are no items
-            if (mIsVisible) {
-                Toast.makeText(getActivity(), getActivity().getString(R.string.toast_no_items), Toast.LENGTH_LONG).show();
+        if (mMap == null) {
+            // This pop-up may not be necessary.  On 4.4.4, the maps window displays a button to get
+            // Google Play services; with Genymotion, if you then click the button the app crashes.
+            if (mCountToastMapsNotAvailable > 0) {
+                Toast.makeText(getActivity(), getActivity().getString(R.string.propagation_maps_not_available), Toast.LENGTH_LONG).show();
+                mCountToastMapsNotAvailable--;
             }
-            // It seems to be much faster to clear the map entirely than to remove the overlay or polylines.
-            mMap.clear();
-            mClusterManager.clearItems();
-            if (!Utility.isFiltered(getActivity())) { // TODO: check total # records in database instead
-                WsprNetViewerSyncAdapter.syncImmediately(getActivity());
-            }
-        } else if (n > 0) {
-            if (mIsVisible) {
-                String msg = getActivity().getString(R.string.toast_num_items, n);
-                Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
-            }
+        } else {
+            if ((n == 0) && (mLastNumItems != 0)) {
+                // only do this once if there are no items
+                if (mIsVisible) {
+                    Toast.makeText(getActivity(), getActivity().getString(R.string.toast_no_items), Toast.LENGTH_LONG).show();
+                }
+                // It seems to be much faster to clear the map entirely than to remove the overlay or polylines.
+                mMap.clear();
+                mClusterManager.clearItems();
+                if (!Utility.isFiltered(getActivity())) { // TODO: check total # records in database instead
+                    WsprNetViewerSyncAdapter.syncImmediately(getActivity());
+                }
+            } else if (n > 0) {
+                if (mIsVisible) {
+                    String msg = getActivity().getString(R.string.toast_num_items, n);
+                    Toast.makeText(getActivity(), msg, Toast.LENGTH_LONG).show();
+                }
 
-            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-            boolean mapTypeHeat = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_type_heat),
-                    Boolean.parseBoolean(getActivity().getString(R.string.pref_maps_settings_default_map_type_heat)));
-            boolean mapTypeGreatCircle = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_type_great_circle),
-                    Boolean.parseBoolean(getActivity().getString(R.string.pref_maps_settings_default_map_type_great_circle)));
-            boolean mapMarkersTxEnable = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_markers_tx_key), false);
-            boolean mapMarkersRxEnable = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_markers_rx_key), false);
-            boolean isMetric = Utility.isMetric(getActivity());
-            boolean mapIntensityRxSnr = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_intensity_snr),
-                    true);
-            boolean mapIntensitySnrMinusDbm = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_intensity_snr_minus_tx_power),
-                    false);
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                boolean mapTypeHeat = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_type_heat),
+                        Boolean.parseBoolean(getActivity().getString(R.string.pref_maps_settings_default_map_type_heat)));
+                boolean mapTypeGreatCircle = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_type_great_circle),
+                        Boolean.parseBoolean(getActivity().getString(R.string.pref_maps_settings_default_map_type_great_circle)));
+                boolean mapMarkersTxEnable = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_markers_tx_key), false);
+                boolean mapMarkersRxEnable = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_markers_rx_key), false);
+                boolean isMetric = Utility.isMetric(getActivity());
+                boolean mapIntensityRxSnr = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_intensity_snr),
+                        true);
+                boolean mapIntensitySnrMinusDbm = prefs.getBoolean(getActivity().getString(R.string.pref_maps_settings_key_map_intensity_snr_minus_tx_power),
+                        false);
 
-            // It seems to be much faster to clear the map entirely than to remove the overlay or polylines.
-            mMap.clear();
-            mClusterManager.clearItems();
-            System.gc(); // also see onLowMemory(), above
+                // It seems to be much faster to clear the map entirely than to remove the overlay or polylines.
+                mMap.clear();
+                mClusterManager.clearItems();
+                System.gc(); // also see onLowMemory(), above
 
-            List<WeightedLatLng> latLngList = new ArrayList<WeightedLatLng>();
-            List<WsprMapMarker> mapMarkerList = new ArrayList<WsprMapMarker>();
-            if (mapTypeHeat || mapTypeGreatCircle || mapMarkersTxEnable || mapMarkersRxEnable) {
-                float[] greatCircleHSV = new float[3];
-                int greatCircleColor = Color.RED;
-                Color.colorToHSV(greatCircleColor, greatCircleHSV);
-                cursor.moveToPosition(-1);
-                // Create a weighted latitude longitude list
-                while (cursor.moveToNext()) {
-                    double latRx = 0, lngRx = 0, rxsnr = 0., txdbm = 0., intensity = 0.;
-                    String txgridsquare = cursor.getString(WsprFragment.COL_WSPR_TX_GRIDSQUARE);
-                    double latTx = Utility.gridsquareToLatitude(txgridsquare);
-                    double lngTx = Utility.gridsquareToLongitude(txgridsquare);
-                    rxsnr = cursor.getDouble(WsprFragment.COL_WSPR_RX_SNR);
-                    txdbm = cursor.getDouble(WsprFragment.COL_WSPR_TX_POWER);
-                    // Summary of TX power for the first 1048575 spots in 2014-09
-                    //           TX power        TX power
-                    //            dBm             watts
-                    // min        -33             5.01187E-07
-                    // max         63          1995.262315
-                    // avg         31.89159764    1.545822999
-                    // std dev      6.96339440    7.682440496
-                    // avg-std dev 24.92820324    0.311042922
-                    // avg+std dev 38.85499205    7.682440496
-                    intensity = rxsnr;
-                    if (mapIntensitySnrMinusDbm) {
-                        intensity = rxsnr - txdbm;
+                List<WeightedLatLng> latLngList = new ArrayList<WeightedLatLng>();
+                List<WsprMapMarker> mapMarkerList = new ArrayList<WsprMapMarker>();
+                if (mapTypeHeat || mapTypeGreatCircle || mapMarkersTxEnable || mapMarkersRxEnable) {
+                    float[] greatCircleHSV = new float[3];
+                    int greatCircleColor = Color.RED;
+                    Color.colorToHSV(greatCircleColor, greatCircleHSV);
+                    cursor.moveToPosition(-1);
+                    // Create a weighted latitude longitude list
+                    while (cursor.moveToNext()) {
+                        double latRx = 0, lngRx = 0, rxsnr = 0., txdbm = 0., intensity = 0.;
+                        String txgridsquare = cursor.getString(WsprFragment.COL_WSPR_TX_GRIDSQUARE);
+                        double latTx = Utility.gridsquareToLatitude(txgridsquare);
+                        double lngTx = Utility.gridsquareToLongitude(txgridsquare);
+                        rxsnr = cursor.getDouble(WsprFragment.COL_WSPR_RX_SNR);
+                        txdbm = cursor.getDouble(WsprFragment.COL_WSPR_TX_POWER);
+                        // Summary of TX power for the first 1048575 spots in 2014-09
+                        //           TX power        TX power
+                        //            dBm             watts
+                        // min        -33             5.01187E-07
+                        // max         63          1995.262315
+                        // avg         31.89159764    1.545822999
+                        // std dev      6.96339440    7.682440496
+                        // avg-std dev 24.92820324    0.311042922
+                        // avg+std dev 38.85499205    7.682440496
+                        intensity = rxsnr;
+                        if (mapIntensitySnrMinusDbm) {
+                            intensity = rxsnr - txdbm;
+                        }
+                        if (mapTypeHeat) {
+                            // TODO: determine if we should display rxsnr or (rxsnr - txdbm).
+                            latLngList.add(new WeightedLatLng(new LatLng(latTx, lngTx), intensity));
+                        }
+                        if (mapTypeGreatCircle || mapMarkersTxEnable || mapMarkersRxEnable) {
+                            String rxgridsquare = cursor.getString(WsprFragment.COL_WSPR_RX_GRIDSQUARE);
+                            latRx = Utility.gridsquareToLatitude(rxgridsquare);
+                            lngRx = Utility.gridsquareToLongitude(rxgridsquare);
+                        }
+                        if (mapTypeGreatCircle) {
+                            // convert snr range of -30 to +20 to saturation of 0.5 to +1.
+                            intensity = intensity < -30. ? -30. : intensity;
+                            intensity = intensity > +20. ? +20. : intensity;
+                            greatCircleHSV[1] = (float) ((intensity + 80) / 100.);
+                            // There may not be alpha support in early Android versions;
+                            //   Build.VERSION.SDK_INT == 10 for GINGERBREAD_MR1
+                            int alpha = (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1) ?
+                                    (int) (255. * (intensity + 40.) / 60.)
+                                    : 255;
+                            polylineList.add(mMap.addPolyline((new PolylineOptions())
+                                    .add(new LatLng(latTx, lngTx), new LatLng(latRx, lngRx))
+                                    .width(1)
+                                    .color(Color.HSVToColor(alpha, greatCircleHSV))
+                                    .geodesic(true)));
+                        }
+                        if (mapMarkersTxEnable || mapMarkersRxEnable) {
+                            double frequency = cursor.getDouble(WsprFragment.COL_WSPR_TX_FREQ_MHZ);
+                            String sFrequency = Utility.formatFrequency(getActivity(), frequency, true);
+                            String sRxSnr = Utility.formatSnr(getActivity(), rxsnr) + "dB";
+                            double km = cursor.getDouble(WsprFragment.COL_WSPR_DISTANCE);
+                            String sDistance = Utility.formatDistance(getActivity(), km, isMetric) +
+                                    (isMetric ?
+                                            getActivity().getString(R.string._units_metric_distance)
+                                            : getActivity().getString(R.string._units_english_distance));
+                            String txCallsign = cursor.getString(WsprFragment.COL_WSPR_TX_CALLSIGN);
+                            String rxCallsign = cursor.getString(WsprFragment.COL_WSPR_RX_CALLSIGN);
+                            String sTxdbm = Utility.formatSnr(getActivity(), txdbm) + "dBm";
+                            String timestamp = cursor.getString(WsprFragment.COL_WSPR_TIMESTAMP);
+                            String timestampText = Utility.getFormattedTimestamp(timestamp, Utility.TIMESTAMP_FORMAT_HOURS_MINUTES);
+                            if (mapMarkersTxEnable) {
+                                String info = getActivity().getString(R.string.string_tx) + ": " +
+                                        timestampText + " UTC: " +
+                                        sFrequency + "MHz @" + sTxdbm;
+                                String description =
+                                        txCallsign + "\u2192" + rxCallsign + ": " +
+                                                sRxSnr + "/" + sDistance;
+                                mapMarkerList.add(new WsprMapMarker(new LatLng(latTx, lngTx),
+                                        info, description, timestamp,
+                                        Utility.getIconResourceForWsprCondition(rxsnr, true)));
+                            }
+                            if (mapMarkersRxEnable) {
+                                String info = getActivity().getString(R.string.string_rx) + ": " +
+                                        timestampText + " UTC: " +
+                                        sFrequency + "MHz @" + sRxSnr;
+                                String description = rxCallsign + "\u2190" + txCallsign + ": " +
+                                        sTxdbm + "/" + sDistance;
+                                mapMarkerList.add(new WsprMapMarker(new LatLng(latRx, lngRx),
+                                        info, description, timestamp,
+                                        Utility.getIconResourceForWsprCondition(rxsnr, true)));
+                            }
+                        }
                     }
                     if (mapTypeHeat) {
-                        // TODO: determine if we should display rxsnr or (rxsnr - txdbm).
-                        latLngList.add(new WeightedLatLng(new LatLng(latTx, lngTx), intensity));
-                    }
-                    if (mapTypeGreatCircle || mapMarkersTxEnable || mapMarkersRxEnable) {
-                        String rxgridsquare = cursor.getString(WsprFragment.COL_WSPR_RX_GRIDSQUARE);
-                        latRx = Utility.gridsquareToLatitude(rxgridsquare);
-                        lngRx = Utility.gridsquareToLongitude(rxgridsquare);
-                    }
-                    if (mapTypeGreatCircle) {
-                        // convert snr range of -30 to +20 to saturation of 0.5 to +1.
-                        intensity = intensity < -30. ? -30. : intensity;
-                        intensity = intensity > +20. ? +20. : intensity;
-                        greatCircleHSV[1] = (float) ((intensity + 80) / 100.);
-                        // There may not be alpha support in early Android versions;
-                        //   Build.VERSION.SDK_INT == 10 for GINGERBREAD_MR1
-                        int alpha = (Build.VERSION.SDK_INT > Build.VERSION_CODES.GINGERBREAD_MR1)?
-                                      (int) (255. * (intensity + 40.) / 60.)
-                                    : 255;
-                        polylineList.add(mMap.addPolyline((new PolylineOptions())
-                                .add(new LatLng(latTx, lngTx), new LatLng(latRx, lngRx))
-                                .width(1)
-                                .color(Color.HSVToColor(alpha, greatCircleHSV))
-                                .geodesic(true)));
-                    }
-                    if (mapMarkersTxEnable || mapMarkersRxEnable) {
-                        double frequency = cursor.getDouble(WsprFragment.COL_WSPR_TX_FREQ_MHZ);
-                        String sFrequency = Utility.formatFrequency(getActivity(), frequency, true);
-                        String sRxSnr = Utility.formatSnr(getActivity(), rxsnr) + "dB";
-                        double km = cursor.getDouble(WsprFragment.COL_WSPR_DISTANCE);
-                        String sDistance = Utility.formatDistance(getActivity(), km, isMetric) +
-                                (isMetric ?
-                                  getActivity().getString(R.string._units_metric_distance)
-                                : getActivity().getString(R.string._units_english_distance) );
-                        String txCallsign = cursor.getString(WsprFragment.COL_WSPR_TX_CALLSIGN);
-                        String rxCallsign = cursor.getString(WsprFragment.COL_WSPR_RX_CALLSIGN);
-                        String sTxdbm = Utility.formatSnr(getActivity(), txdbm) + "dBm";
-                        String timestamp = cursor.getString(WsprFragment.COL_WSPR_TIMESTAMP);
-                        String timestampText = Utility.getFormattedTimestamp(timestamp, Utility.TIMESTAMP_FORMAT_HOURS_MINUTES);
-                        if (mapMarkersTxEnable) {
-                            String info = getActivity().getString(R.string.string_tx) + ": " +
-                                    timestampText + " UTC: " +
-                                    sFrequency + "MHz @" + sTxdbm;
-                            String description =
-                                    txCallsign + "\u2192" + rxCallsign + ": " +
-                                    sRxSnr + "/" + sDistance;
-                            mapMarkerList.add(new WsprMapMarker(new LatLng(latTx, lngTx),
-                                    info, description, timestamp,
-                                    Utility.getIconResourceForWsprCondition(rxsnr, true)));
+                        // Draw the heat map
+                        if (mHeatMapProvider == null) {
+                            // Create a heat map tile provider, passing it the latlngs.
+                            mHeatMapProvider = new HeatmapTileProvider.Builder()
+                                    .weightedData(latLngList)
+                                    .build();
+                            mHeatMapProvider.setRadius(ALT_HEATMAP_RADIUS);
                         }
-                        if (mapMarkersRxEnable) {
-                            String info = getActivity().getString(R.string.string_rx) + ": " +
-                                    timestampText + " UTC: " +
-                                    sFrequency + "MHz @" + sRxSnr;
-                            String description = rxCallsign + "\u2190" + txCallsign + ": " +
-                                    sTxdbm + "/" + sDistance;
-                            mapMarkerList.add(new WsprMapMarker(new LatLng(latRx, lngRx),
-                                    info, description, timestamp,
-                                    Utility.getIconResourceForWsprCondition(rxsnr, true)));
-                        }
+                        mHeatMapOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mHeatMapProvider));
                     }
                 }
-                if (mapTypeHeat) {
-                    // Draw the heat map
-                    if (mHeatMapProvider == null) {
-                        // Create a heat map tile provider, passing it the latlngs.
-                        mHeatMapProvider = new HeatmapTileProvider.Builder()
-                                .weightedData(latLngList)
-                                .build();
-                        mHeatMapProvider.setRadius(ALT_HEATMAP_RADIUS);
-                    }
-                    mHeatMapOverlay = mMap.addTileOverlay(new TileOverlayOptions().tileProvider(mHeatMapProvider));
+
+                // Add markers
+                if (mapMarkersTxEnable || mapMarkersRxEnable) {
+                    mClusterManager.addItems(mapMarkerList);
+                    mClusterManager.cluster();
                 }
-            }
-
-            // Add markers
-            if (mapMarkersTxEnable || mapMarkersRxEnable) {
-                mClusterManager.addItems(mapMarkerList);
-                mClusterManager.cluster();
-            }
 
 
-        } // have WSPR points
+            } // have WSPR points
+        } // mMap != null
         mLastNumItems = n;
     }
 
@@ -818,6 +827,9 @@ public class PropagationMapsFragment extends Fragment
      * without needing to register a LocationListener.
      */
     public void showMyLocation(View view) {
+        if (mMap == null) {
+            return;
+        }
         LatLng   latLng = null;
         if (latLng == null) {
             String gridsquare = Utility.getPreferredGridsquare(getActivity());

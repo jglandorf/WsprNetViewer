@@ -34,8 +34,6 @@ public class WsprAdapter extends CursorAdapter {
     private static final int VIEW_TYPE_COUNT = 2;
     private static final int VIEW_TYPE_RECENT = 0;
     private static final int VIEW_TYPE_OLDER = 1;
-    // Flag to determine if we want to use a separate view for "recent reports".
-    private boolean mUseDualPane = false;
     public int mainDisplayFormat = -1;
 
     /**
@@ -77,10 +75,6 @@ public class WsprAdapter extends CursorAdapter {
 
     public WsprAdapter(Context context, Cursor c, int flags) {
         super(context, c, flags);
-    }
-
-    public void setUseDualPane(boolean useDualPane) {
-        mUseDualPane = useDualPane;
     }
 
     @Override
@@ -183,9 +177,6 @@ public class WsprAdapter extends CursorAdapter {
 
     //@Override
     public int getItemViewType(int position) {
-        // TODO: Determine if we need an alternate listview for newer vs. older items; get isRecent() working if we do.
-        //       Figure out if this can be implemented with the standard override function.
-        //return (Utility.isRecent(mContext, timestamp, Utility.cutoffHours(mContext)) || mUseDualPane) ? VIEW_TYPE_RECENT : VIEW_TYPE_OLDER;
         return VIEW_TYPE_OLDER;
     }
 

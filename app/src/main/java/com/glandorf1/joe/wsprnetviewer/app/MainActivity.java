@@ -37,7 +37,7 @@ import com.glandorf1.joe.wsprnetviewer.app.sync.WsprNetViewerSyncAdapter;
 
 public class MainActivity extends ActionBarActivity
         implements WsprFragment.Callback,
-        View.OnClickListener,
+//        View.OnClickListener,
         PropagationMapsFiltersDialog.OnPropagationMapFiltersListenerView,
         PropagationMapsFiltersDialog.OnPropagationMapFiltersListenerTextView,
         PropagationMapsFiltersDialog.OnPropagationMapFiltersListenerDismiss,
@@ -50,7 +50,7 @@ public class MainActivity extends ActionBarActivity
         PropagationMapsFiltersWavelengthDialog.OnPropagationMapFiltersWavelengthListenerTextView
     {
     private final String LOG_TAG = MainActivity.class.getSimpleName();
-    private boolean mDualPane;  // provision for putting the details fragment next to this fragment for wider screens
+    private boolean mDualPane = false;  // provision for putting the details fragment next to this fragment for wider screens
     private FragmentStatePagerAdapter adapterViewPager;
     private ViewPager mPager;
     protected Fragment mCurrentFragment = null;
@@ -59,29 +59,26 @@ public class MainActivity extends ActionBarActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main); // WsprFragment gets created here.
         // Display EULA
         new SimpleEula(this).show();
-        // WsprFragment is now declared directly in layout xml file.
-        if (findViewById(R.id.wspr_detail_container) != null) {
-            // The detail container view will be present only in the large-screen layouts
-            // (res/layout-sw800dp). If this view is present, then the activity should be
-            // in two-pane mode.
-            mDualPane = true;
-
-            // In two-pane mode, show the detail view in this activity by
-            // adding or replacing the detail fragment using a fragment transaction.
-            if (savedInstanceState == null) {
-                getSupportFragmentManager().beginTransaction()  // getSupportFragmentManager() is this from the support lib?
-                        .replace(R.id.wspr_detail_container, new DetailFragment())
-                        .commit();
-            }
-        } else {
-            mDualPane = false;
-        }
-//        WsprFragment wsprFragment = ((WsprFragment) getSupportFragmentManager()
-//            .findFragmentById(R.id.fragment_wspr));
-//        wsprFragment.setDualPane(mDualPane);
+//        // WsprFragment is now declared directly in layout xml file.
+//        if (findViewById(R.id.wspr_detail_container) != null) {
+//            // The detail container view will be present only in the large-screen layouts
+//            // (res/layout-sw800dp). If this view is present, then the activity should be
+//            // in two-pane mode.
+//            mDualPane = true;
+//
+//            // In two-pane mode, show the detail view in this activity by
+//            // adding or replacing the detail fragment using a fragment transaction.
+//            if (savedInstanceState == null) {
+//                getSupportFragmentManager().beginTransaction()
+//                        .replace(R.id.wspr_detail_container, new DetailFragment())
+//                        .commit();
+//            }
+//        } else {
+//            mDualPane = false;
+//        }
 
         mPager = (ViewPager) findViewById(R.id.pager);
         adapterViewPager = new MyStatePagerAdapter(getSupportFragmentManager());
@@ -174,61 +171,62 @@ public class MainActivity extends ActionBarActivity
         builder.show();
     }
 
-        @Override
-        public void onClick(View view) {
-
-        }
+//        @Override
+//        public void onClick(View view) {
+//
+//        }
 
         protected final int WSPR_TAB = 0;
         protected final int MAPS_TAB = 1;
         protected final int NUM_TABS = 2;
 
         public class MyStatePagerAdapter extends FragmentStatePagerAdapter {
-        public MyStatePagerAdapter(FragmentManager fragmentManager) {
-            super(fragmentManager);
-//            fragments = new Fragment[]{
-//                    new WsprFragment(),
-//                    new PropagationMapsFragment()
-//            };
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-//            String s = fragments[position].getClass().getSimpleName(); // this works
-//            return (CharSequence)s;
-            switch(position) {
-                case WSPR_TAB: return "WSPR";
-                case MAPS_TAB: return "Map ";
-                default: return "tab Huh?!?";
+            public MyStatePagerAdapter(FragmentManager fragmentManager) {
+                super(fragmentManager);
+    //            fragments = new Fragment[]{
+    //                    new WsprFragment(),
+    //                    new PropagationMapsFragment()
+    //            };
             }
-        }
 
-        @Override
-        public int getCount() {
-//            return fragments.length;
-            return NUM_TABS;
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-//            Fragment f = fragments[position];
-//            return f;
-            switch (position) {
-                case WSPR_TAB:
-                    return new WsprFragment();
-                case MAPS_TAB:
-                    return new PropagationMapsFragment();
-                default:
-                    return null;
+            @Override
+            public CharSequence getPageTitle(int position) {
+    //            String s = fragments[position].getClass().getSimpleName(); // this works
+    //            return (CharSequence)s;
+                switch(position) {
+                    case WSPR_TAB: return "WSPR";
+                    case MAPS_TAB: return "Map ";
+                    default: return "tab Huh?!?";
+                }
             }
-        } // getItem()
 
-        @Override
-        public void setPrimaryItem(ViewGroup container, int position, Object object) {
-            if (mCurrentFragment != object) {
-                mCurrentFragment = (Fragment) object;
-            }            super.setPrimaryItem(container, position, object);
-        }
+            @Override
+            public int getCount() {
+    //            return fragments.length;
+                return NUM_TABS;
+            }
+
+            @Override
+            public Fragment getItem(int position) {
+    //            Fragment f = fragments[position];
+    //            return f;
+                switch (position) {
+                    case WSPR_TAB:
+                        return new WsprFragment();
+                    case MAPS_TAB:
+                        return new PropagationMapsFragment();
+                    default:
+                        return null;
+                }
+            } // getItem()
+
+            @Override
+            public void setPrimaryItem(ViewGroup container, int position, Object object) {
+                if (mCurrentFragment != object) {
+                    mCurrentFragment = (Fragment) object;
+                }
+                super.setPrimaryItem(container, position, object);
+            }
         } // MyStatePagerAdapter
 
 

@@ -58,10 +58,69 @@ import java.util.Vector;
 public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int WSPR_NOTIFICATION_ID = 3004; // TODO: is NOTIFICATION_ID chosen at random?
     private static final String LOG_TAG = WsprNetViewerSyncAdapter.class.getSimpleName();
+    private static final String emptyString = "";
+    private static final String oneSpaceString = " ";
+    private static final String equalSignString = "=";
+    private static final String semicolonString = ";";
+    private static final boolean DRUPAL = false; // true= use wsprnet.org drupal database; false= use wsprnet.org old database
+
+    // These are the names of the objects that need to be extracted.
+    // column# 0             1       2           3    4       5      6     7          8     9       10
+    //   Timestamp	        Call	MHz	        SNR	Drift	Grid	Pwr	Reporter	RGrid	km      az
+    //   2014-08-25 20:40 	DL8EDC  7.040186 	-4 	 0   	JO31le 	 5 	 LA3JJ/L 	JO59bh 	925     11
+
+    // Gridsquare information
+    static final String WSPRNET_IDX_CITY = "city_name";
+    static final String WSPRNET_IDX_COUNTRY_NAME = "name";
+    //static final String WSPRNET_IDX_COORD = "coord";
+    static final String WSPRNET_IDX_COORD_LAT = "lat";
+    static final String WSPRNET_IDX_COORD_LONG = "lon";
+
+    // Wspr information html element indices for their 'new' drupal interface.
+    //   e.g.: http://wsprnet.org/drupal/wsprnet/spots
+    static final int WSPRNET_IDX_TIMESTAMP = 0;
+    static final int WSPRNET_IDX_TX_CALLSIGN = 1;
+    static final int WSPRNET_IDX_TX_FREQ_MHZ = 2;
+    static final int WSPRNET_IDX_RX_SNR = 3;
+    static final int WSPRNET_IDX_RX_DRIFT = 4;
+    static final int WSPRNET_IDX_TX_GRIDSQUARE = 5;
+    static final int WSPRNET_IDX_TX_POWER = 6;
+    static final int WSPRNET_IDX_RX_CALLSIGN = 7;
+    static final int WSPRNET_IDX_RX_GRIDSQUARE = 8;
+    static final int WSPRNET_IDX_DISTANCE = 9;
+    static final int WSPRNET_IDX_AZIMUTH = 10;
+
+    // Wspr information html element indices for their 'old' url query interface.
+    //   e.g.: http://wsprnet.org/olddb?mode=html&band=all&limit=10&findcall=&findreporter=&sort=date
+    static final int WSPRNET_IDX_OLDDB_TIMESTAMP = 0;
+    static final int WSPRNET_IDX_OLDDB_TX_CALLSIGN = 1;
+    static final int WSPRNET_IDX_OLDDB_TX_FREQ_MHZ = 2;
+    static final int WSPRNET_IDX_OLDDB_RX_SNR = 3;
+    static final int WSPRNET_IDX_OLDDB_RX_DRIFT = 4;
+    static final int WSPRNET_IDX_OLDDB_TX_GRIDSQUARE = 5;
+    static final int WSPRNET_IDX_OLDDB_TX_POWER_DBM = 6;
+    static final int WSPRNET_IDX_OLDDB_TX_POWER_W = 7;
+    static final int WSPRNET_IDX_OLDDB_RX_CALLSIGN = 8;
+    static final int WSPRNET_IDX_OLDDB_RX_GRIDSQUARE = 9;
+    static final int WSPRNET_IDX_OLDDB_DISTANCE_KM = 10;
+    static final int WSPRNET_IDX_OLDDB_DISTANCE_MILES = 11;
+
+    final int wsprnetIdxTimestamp     = (DRUPAL) ? WSPRNET_IDX_TIMESTAMP     : WSPRNET_IDX_OLDDB_TIMESTAMP;
+    final int wsprnetIdxTxCallsign    = (DRUPAL) ? WSPRNET_IDX_TX_CALLSIGN   : WSPRNET_IDX_OLDDB_TX_CALLSIGN;
+    final int wsprnetIdxTxFreqMhz     = (DRUPAL) ? WSPRNET_IDX_TX_FREQ_MHZ   : WSPRNET_IDX_OLDDB_TX_FREQ_MHZ;
+    final int wsprnetIdxRxSnr         = (DRUPAL) ? WSPRNET_IDX_RX_SNR        : WSPRNET_IDX_OLDDB_RX_SNR;
+    final int wsprnetIdxRxDrift       = (DRUPAL) ? WSPRNET_IDX_RX_DRIFT      : WSPRNET_IDX_OLDDB_RX_DRIFT;
+    final int wsprnetIdxTxGridsquare  = (DRUPAL) ? WSPRNET_IDX_TX_GRIDSQUARE : WSPRNET_IDX_OLDDB_TX_GRIDSQUARE;
+    final int wsprnetIdxTxPowerDbm    = (DRUPAL) ? WSPRNET_IDX_TX_POWER      : WSPRNET_IDX_OLDDB_TX_POWER_DBM;
+    final int wsprnetIdxRxCallsign    = (DRUPAL) ? WSPRNET_IDX_RX_CALLSIGN   : WSPRNET_IDX_OLDDB_RX_CALLSIGN;
+    final int wsprnetIdxRxGridsquare  = (DRUPAL) ? WSPRNET_IDX_RX_GRIDSQUARE : WSPRNET_IDX_OLDDB_RX_GRIDSQUARE;
+    final int wsprnetIdxDistanceKm    = (DRUPAL) ? WSPRNET_IDX_DISTANCE      : WSPRNET_IDX_OLDDB_DISTANCE_KM;
+    final int wsprnetIdxAzimuth       = (DRUPAL) ? WSPRNET_IDX_AZIMUTH       : -1; // old database doesn't report azimuth
+
     // Default interval at which to sync with wsprnet.org, in seconds.
     public static final int SYNC_INTERVAL = 60 * 60;  // 1 hour
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 4; // +/- 15 minutes
-    private static final double mBandFrequencyTolerancePercent = 5.;
+    private static final double BandFrequencyTolerancePercent = 5.;
     private static Double[] mBandFrequency, mBandFrequencyMin, mBandFrequencyMax;
     private static String[] mBandFrequencyStr, mBandNameStr;
     private static int mBandNameIdx = -1;
@@ -78,7 +137,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle bundle, String s, ContentProviderClient contentProviderClient, SyncResult syncResult) {
         // TODO:  verify if wsprSpotQuery is no longer needed
-        String wsprSpotQuery = "";
+        String wsprSpotQuery = emptyString;
             wsprSpotQuery = Utility.getPreferredGridsquare(mContext);
         // If there's no gridsquare code, there's nothing to look up.
         if (wsprSpotQuery.length() == 0) {
@@ -91,11 +150,10 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
             // For url_wsprnet_spots_old, drupal must be false!
           //String source = mContext.getString(R.string.url_wsprnet_spots);
             String source = mContext.getString(R.string.url_wsprnet_spots_old);
-            boolean drupal = false; // true= drupal url; false= old database format
             Document wsprHtmlDoc = getWsprData(mContext, source);
             // TODO: 'maxSpots' is unused in queries until it is known how to submit a direct Drupal query to wspr web site.
             int maxSpots = 1000;
-            getWsprDataFromTags(mContext, wsprHtmlDoc, maxSpots, wsprSpotQuery, drupal);
+            getWsprDataFromTags(mContext, wsprHtmlDoc, maxSpots, wsprSpotQuery);
         } catch (Throwable e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
@@ -152,35 +210,9 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         Document wsprHtmlDoc = Jsoup.parse(context.getString(R.string.html_empty_page));
         try {
             Log.d("Utility", "Connecting to [" + source + "]");
-            // Allow html to come from an external app-private file, resource string, or live web site.
-            if (source.startsWith(context.getString(R.string.file_wsprnet_spots_prefix))) {
-                // get data from file
-//                // TODO: get this working--can't load the file that was manually dropped onto SD card; maybe
-//                // todo:   USB debug connection prevents local SD card access?
-//                File pdir = context.getExternalFilesDir(null);
-//                File[] files = pdir.listFiles();
-//                for (File inFile : files) {
-//                    if (!inFile.isDirectory()) {
-//                        Log.d(LOG_TAG, inFile.getName() + ", " + inFile.getAbsolutePath() + ", " + inFile.getCanonicalPath());
-//                    }
-//                }
-//                String fname = pdir.toString() + source.replaceFirst("file:", "");
-//                File input = new File(fname);
-//                wsprHtmlDoc = Jsoup.parse(input, "UTF-8");
-            } else if ((source.startsWith(context.getString(R.string.html_wsprnet_spots_prefix)))) {
-                // get data from internal string
-//                String html = context.getString(R.string.html_wsprnet_spots_data11)
-//                        + context.getString(R.string.html_wsprnet_spots_data12)
-//                        + context.getString(R.string.html_wsprnet_spots_data13)
-//                        + context.getString(R.string.html_wsprnet_spots_data14);
-//                wsprHtmlDoc = Jsoup.parse(URLDecoder.decode(html, "UTF-8"));
-            } else if ((source.startsWith(context.getString(R.string.url_wsprnet_spots)))) {
-                // Get wspr info from http://www.wsprnet.org/drupal/wsprnet/spots; e.g.:
-                wsprHtmlDoc = Jsoup.connect(source).get();
-            } else if ((source.startsWith(context.getString(R.string.url_wsprnet_spots_old_base)))) {
-                // Get wspr info from http://www.wsprnet.org/drupal/wsprnet/spots; e.g.:
-                wsprHtmlDoc = Jsoup.connect(source).get();
-            }
+            // Allow html to come from the old wsprnet.org database (permits URL parameters) or the newer drupal database.
+            // Get wspr info from, e.g., http://www.wsprnet.org/drupal/wsprnet/spots; e.g.:
+            wsprHtmlDoc = Jsoup.connect(source).get();
             Log.d("getWsprData", "Connected to ["+source+"]");
         } // try
         catch(Throwable t) {
@@ -190,33 +222,11 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
     } // getWsprData()
 
     /**
-     * Returns name of frequency band, or "" if not within a valid frequency band.
-     * @param context
-     * @param idx - pass in 'mBandNameIdx', as set by getFrequencyBandCheck()
-     * @return Returns name of frequency band, or "" if not within a valid frequency band.
+     * Makes sure the frequency band check arrays are set up.
+     * Returns true if they are, false if not.
      */
-    public String getFrequencyBandName(Context context, int idx) {
-        if ((mBandNameStr == null) || (mBandNameStr.length <= 0)) {
-            Resources res = context.getResources();
-            mBandNameStr = res.getStringArray(R.array.pref_notify_band_options);
-        }
-        if ((idx >= 0) && (idx < mBandNameStr.length)) {
-            return mBandNameStr[idx];
-        } else {
-            return "";
-        }
-    }
-
-    /**
-     * Determines if a frequency is in one of the bands in R.array.pref_notify_band_values.
-     * Checks if it is also in the notification band-- if it is, then set mBandNameIdx.
-     * @param context
-     * @param freqMhz - a frequency in MHz as returned by a specific WSPR report
-     * @param tolerancePercent - freqMhz is in the band if within +/-tolerance of the band's center frequency
-     * @return Returns -1 if not within a valid frequency band; also sets mBandNameIdx.
-     */
-    public double getFrequencyBandCheck(Context context, double freqMhz, double tolerancePercent) {
-        double band = -1;
+    private boolean frequencyBandCheckSetup(Context context, double tolerancePercent) {
+        boolean setUpOk = false;
         if ((mBandFrequencyStr == null) || (mBandFrequencyStr.length <= 0)) {
             Resources res = context.getResources();
             mBandFrequencyStr = res.getStringArray(R.array.pref_notify_band_values);
@@ -235,6 +245,41 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                     mBandFrequencyMax[i] = mBandFrequency[i] + (mBandFrequency[i] * (tolerancePercent / 100.));
                 }
             }
+            setUpOk = true;
+        }
+        return setUpOk;
+    }
+
+    /**
+     * Returns name of frequency band, or "" if not within a valid frequency band.
+     * @param context
+     * @param idx - pass in 'mBandNameIdx', as set by getFrequencyBandCheck()
+     * @return Returns name of frequency band, or "" if not within a valid frequency band.
+     */
+    public String getFrequencyBandName(Context context, int idx) {
+        if ((mBandNameStr == null) || (mBandNameStr.length <= 0)) {
+            Resources res = context.getResources();
+            mBandNameStr = res.getStringArray(R.array.pref_notify_band_options);
+        }
+        if ((idx >= 0) && (idx < mBandNameStr.length)) {
+            return mBandNameStr[idx];
+        } else {
+            return emptyString;
+        }
+    }
+
+    /**
+     * Determines if a frequency is in one of the bands in R.array.pref_notify_band_values.
+     * Checks if it is also in the notification band-- if it is, then set mBandNameIdx.
+     * @param context
+     * @param freqMhz - a frequency in MHz as returned by a specific WSPR report
+     * @param tolerancePercent - freqMhz is in the band if within +/-tolerance of the band's center frequency
+     * @return Returns -1 if not within a valid frequency band; also sets mBandNameIdx.
+     */
+    public double getFrequencyBandCheck(Context context, double freqMhz, double tolerancePercent) {
+        double band = -1;
+
+        if (frequencyBandCheckSetup(context, tolerancePercent)) {
             if ((mBandFrequency != null) && (mBandFrequency.length > 0)) {
                 for (int i = 0; i < mBandFrequency.length; i++) {
                     if ((mBandFrequencyMin[i] <= freqMhz) && (freqMhz <= mBandFrequencyMax[i])) {
@@ -285,8 +330,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             Date inputTimestamp = timestampFormatIn.parse(timestampStr);
             inputTimestamp.setTime(inputTimestamp.getTime()); // + millisecondOffset); // can add a fake ms value to make timestamp unique
-            String dbTimestamp = WsprNetContract.getDbTimestampString(inputTimestamp);
-            return dbTimestamp;
+            return WsprNetContract.getDbTimestampString(inputTimestamp);
         } catch (ParseException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             //e.printStackTrace();
@@ -314,56 +358,14 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         return i;
     }
 
-
     /**
      * Parse the Document containing the wspr data in HTML format.
      * Call from 'doInBackground()', etc.
      */
     public void getWsprDataFromTags(Context context, Document wsprHtml, int maxSpots,
-                                           String gridsquareSetting, boolean drupal)
+                                           String gridsquareSetting)
             throws Throwable {
 
-        // These are the names of the objects that need to be extracted.
-        // column# 0             1       2           3    4       5      6     7          8     9       10
-        //   Timestamp	        Call	MHz	        SNR	Drift	Grid	Pwr	Reporter	RGrid	km      az
-        //   2014-08-25 20:40 	DL8EDC  7.040186 	-4 	 0   	JO31le 	 5 	 LA3JJ/L 	JO59bh 	925     11
-
-        // Gridsquare information
-        final String WSPRNET_IDX_CITY = "city_name";
-        final String WSPRNET_IDX_COUNTRY_NAME = "name";
-        //final String WSPRNET_IDX_COORD = "coord";
-        final String WSPRNET_IDX_COORD_LAT = "lat";
-        final String WSPRNET_IDX_COORD_LONG = "lon";
-
-        // Wspr information html element indices for their 'new' drupal interface.
-        //   e.g.: http://wsprnet.org/drupal/wsprnet/spots
-        final int WSPRNET_IDX_TIMESTAMP = 0;
-        final int WSPRNET_IDX_TX_CALLSIGN = 1;
-        final int WSPRNET_IDX_TX_FREQ_MHZ = 2;
-        final int WSPRNET_IDX_RX_SNR = 3;
-        final int WSPRNET_IDX_RX_DRIFT = 4;
-        final int WSPRNET_IDX_TX_GRIDSQUARE = 5;
-        final int WSPRNET_IDX_TX_POWER = 6;
-        final int WSPRNET_IDX_RX_CALLSIGN = 7;
-        final int WSPRNET_IDX_RX_GRIDSQUARE = 8;
-        final int WSPRNET_IDX_DISTANCE = 9;
-        final int WSPRNET_IDX_AZIMUTH = 10;
-
-        // Wspr information html element indices for their 'old' url query interface.
-        //   e.g.: http://wsprnet.org/olddb?mode=html&band=all&limit=10&findcall=&findreporter=&sort=date
-        final int WSPRNET_IDX_OLDDB_TIMESTAMP = 0;
-        final int WSPRNET_IDX_OLDDB_TX_CALLSIGN = 1;
-        final int WSPRNET_IDX_OLDDB_TX_FREQ_MHZ = 2;
-        final int WSPRNET_IDX_OLDDB_RX_SNR = 3;
-        final int WSPRNET_IDX_OLDDB_RX_DRIFT = 4;
-        final int WSPRNET_IDX_OLDDB_TX_GRIDSQUARE = 5;
-        final int WSPRNET_IDX_OLDDB_TX_POWER_DBM = 6;
-        final int WSPRNET_IDX_OLDDB_TX_POWER_W = 7;
-        final int WSPRNET_IDX_OLDDB_RX_CALLSIGN = 8;
-        final int WSPRNET_IDX_OLDDB_RX_GRIDSQUARE = 9;
-        final int WSPRNET_IDX_OLDDB_DISTANCE_KM = 10;
-        final int WSPRNET_IDX_OLDDB_DISTANCE_MILES = 11;
-        
         // Notification calculations
         double minSNR  = Utility.getNotifyMinSNR(context);
         double notifyBandMHz = Utility.getNotifyBand(context),
@@ -401,8 +403,8 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         TimeZone tz = TimeZone.getDefault();
         int offsetUTC = tz.getOffset(cal.getTimeInMillis()) / 1000;
         int seconds = Utility.cutoffSeconds(context);
-        cal.add(Calendar.SECOND, -offsetUTC);
-        cal.add(Calendar.SECOND, -seconds);
+        cal.add(Calendar.SECOND, -offsetUTC); // current UTC time
+        cal.add(Calendar.SECOND, -seconds);   // cutoff time-- ignore items older than <user preference>
         String cutoffTimestamp = WsprNetContract.getDbTimestampString(cal.getTime());
         int d;
         d = context.getContentResolver().delete(WsprNetContract.SignalReportEntry.CONTENT_URI,
@@ -410,11 +412,11 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                 new String[]{cutoffTimestamp});
         Log.v(LOG_TAG, "getWsprDataFromTags: deleted " + Integer.toString(d) + " old items.");
 
-        // Get the cutoff date for notifications.
+        // Get the cutoff date for notifications (current time +/- the update interval.)
         cal.setTime(new Date());
         seconds = Utility.updateIntervalSeconds(context);
-        cal.add(Calendar.SECOND, -offsetUTC);
-        cal.add(Calendar.SECOND, -seconds);
+        cal.add(Calendar.SECOND, -offsetUTC); // current UTC time
+        cal.add(Calendar.SECOND, -seconds);   // cutoff time-- ignore items older than the update interval
         long cutoffNotifyTimeMin = getShortTimestamp(cal.getTime());
         cal.add(Calendar.SECOND, 2*seconds);
         long cutoffNotifyTimeMax = getShortTimestamp(cal.getTime());
@@ -431,9 +433,9 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Insert the gridsquare into the database.
             long locationID = addGridsquare(context, gridsquareSetting, cityName, countryName, cityLatitude, cityLongitude);
-            Elements wsprHeader, wsprHeader1, wsprHeader2; // TODO: someday, match up header name instead of relying on a fixed column #
+            //Elements wsprHeader, wsprHeader1, wsprHeader2; // TODO: someday, match up header name instead of relying on a fixed column #
             Elements wsprData;
-            wsprData = getWsprData(wsprHtml, drupal);
+            wsprData = getWsprData(wsprHtml, DRUPAL);
 
             // Get and insert the new wspr information into the database
             Vector<ContentValues> cVVector = new Vector<ContentValues>(wsprData.size());
@@ -446,60 +448,43 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 String timestamp, txCallsign, txGridsquare, rxCallsign, rxGridsquare;
                 Double txFreqMhz, rxSnr, rxDrift, txPower, kmDistance, azimuth;
-                if (drupal == true) {
-                    // Wspr information  for the 'drupal' url query interface.
-                    // Get wspr info from http://www.wsprnet.org/drupal/wsprnet/spots; e.g.:
-                    //   <table>
-                    //   <tr>  <th's> Timestamp	        Call	MHz	        SNR	Drift	Grid	Pwr	Reporter	RGrid	km      az
-                    //   <tr>  <td's> 2014-08-25 20:40 	DL8EDC  7.040186 	-4 	 0   	JO31le 	 5 	 LA3JJ/L 	JO59bh 	925     11
-                    //   <tr>  <td's> 2014-08-25 20:40 	DL8EDC  7.040183 	-9 	 0   	JO31le 	 5 	 OZ2ABB 	JO65au 	618     31
-                    //   <tr>  <td's> 2014-08-25 20:40 	DL8EDC  7.040178 	-14	 0   	JO31le 	 5 	 OH7FES 	KP53bh 	1919    37
-                    //    ... </table>
-                    // Note: each item in the header or row is a <td> (but not shown above.)
-                    // Use the Firefox plugin Firebug to determine the html structure:
-                    //   highlight one of the table rows, right-click on the corresponding <TR> element in the
-                    //   plugin, then select "Copy CSS Path"; clipboard contains, e.g.:
-                    //     html.js body.html.not-front.not-logged-in.one-sidebar.sidebar-first.page-wsprnet.page-wsprnet-spots div#page div#middlecontainer div#main div#squeeze div#squeeze-content div#inner-content div.region.region-content div#block-system-main.block.block-system div.content table tbody tr
-                    //Elements wsprHeader = wsprHtml.select("div#block-system-main.block.block-system div.content table tbody tr:eq(0)");
-                    //Elements wsprData = wsprHtml.select("div#block-system-main.block.block-system div.content table tbody tr:gt(0)");
-                    //Element wsprOneRow = wsprData.get(0);  // syntax to get specific element #
-                    //Elements wsprTDRow = wsprRow.select("th"); // syntax to get header elements
-                    //Elements wsprTDRow = wsprRow.select("td"); // syntax to get data elements
+                // Wspr information  for the 'drupal' url query interface.
+                // Get wspr info from http://www.wsprnet.org/drupal/wsprnet/spots; e.g.:
+                //   <table>
+                //   <tr>  <th's> Timestamp	        Call	MHz	        SNR	Drift	Grid	Pwr	Reporter	RGrid	km      az
+                //   <tr>  <td's> 2014-08-25 20:40 	DL8EDC  7.040186 	-4 	 0   	JO31le 	 5 	 LA3JJ/L 	JO59bh 	925     11
+                //   <tr>  <td's> 2014-08-25 20:40 	DL8EDC  7.040183 	-9 	 0   	JO31le 	 5 	 OZ2ABB 	JO65au 	618     31
+                //   <tr>  <td's> 2014-08-25 20:40 	DL8EDC  7.040178 	-14	 0   	JO31le 	 5 	 OH7FES 	KP53bh 	1919    37
+                //    ... </table>
+                // Note: each item in the header or row is a <td> (but not shown above.)
+                // Use the Firefox plugin Firebug to determine the html structure:
+                //   highlight one of the table rows, right-click on the corresponding <TR> element in the
+                //   plugin, then select "Copy CSS Path"; clipboard contains, e.g.:
+                //     html.js body.html.not-front.not-logged-in.one-sidebar.sidebar-first.page-wsprnet.page-wsprnet-spots div#page div#middlecontainer div#main div#squeeze div#squeeze-content div#inner-content div.region.region-content div#block-system-main.block.block-system div.content table tbody tr
+                //Elements wsprHeader = wsprHtml.select("div#block-system-main.block.block-system div.content table tbody tr:eq(0)");
+                //Elements wsprData = wsprHtml.select("div#block-system-main.block.block-system div.content table tbody tr:gt(0)");
+                //Element wsprOneRow = wsprData.get(0);  // syntax to get specific element #
+                //Elements wsprTDRow = wsprRow.select("th"); // syntax to get header elements
+                //Elements wsprTDRow = wsprRow.select("td"); // syntax to get data elements
 
-                    // Get rid of "&nbsp;" (non-break space character)
-                    // Save timestamp as: "yyyyMMddHHmmssSSS"
-                    timestamp = parseTimestamp(wsprTDRow.get(WSPRNET_IDX_TIMESTAMP).text()
-                            .replace(Utility.NBSP, ' ').replace(" .", ".").replace(".0000", "").trim());
-                    txCallsign = wsprTDRow.get(WSPRNET_IDX_TX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
-                    txFreqMhz = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_TX_FREQ_MHZ).text().replace(Utility.NBSP, ' ').trim());
-                    rxSnr = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_RX_SNR).text().replace(Utility.NBSP, ' ').trim());
-                    rxDrift = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_RX_DRIFT).text().replace(Utility.NBSP, ' ').trim());
-                    txGridsquare = wsprTDRow.get(WSPRNET_IDX_TX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
-                    txPower = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_TX_POWER).text().replace(Utility.NBSP, ' ').trim());
-                    rxCallsign = wsprTDRow.get(WSPRNET_IDX_RX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
-                    rxGridsquare = wsprTDRow.get(WSPRNET_IDX_RX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
-                    kmDistance = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_DISTANCE).text().replace(Utility.NBSP, ' ').trim());
-                    azimuth = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_AZIMUTH).text().replace(Utility.NBSP, ' ').trim());
-                } else {
-                    // Wspr information  for the 'old' url query interface.
-                    //   e.g.: http://wsprnet.org/olddb?mode=html&band=all&limit=10&findcall=&findreporter=&sort=date
-                    // Save timestamp as: "yyyyMMddHHmmssSSS"
-                    timestamp = parseTimestamp(wsprTDRow.get(WSPRNET_IDX_OLDDB_TIMESTAMP).text()
-                            .replace(Utility.NBSP, ' ').replace(" .", ".").replace(".0000", "").trim());
-                    txCallsign = wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
-                    txFreqMhz = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_FREQ_MHZ).text().replace(Utility.NBSP, ' ').trim());
-                    rxSnr = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_SNR).text().replace(Utility.NBSP, ' ').trim());
-                    rxDrift = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_DRIFT).text().replace(Utility.NBSP, ' ').trim());
-                    txGridsquare = wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
-                    txPower = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_TX_POWER_DBM).text().replace(Utility.NBSP, ' ').trim());
-                    rxCallsign = wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_CALLSIGN).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
-                    rxGridsquare = wsprTDRow.get(WSPRNET_IDX_OLDDB_RX_GRIDSQUARE).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
-                    kmDistance = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_DISTANCE_KM).text().replace(Utility.NBSP, ' ').trim());
-                  //miDistance = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_DISTANCE_MILES).text().replace(Utility.NBSP, ' ').trim());
-                    // azimuth not provided; must calculate it ourselves
-                    azimuth = Utility.latLongToAzimuth(Utility.gridsquareToLatitude(txGridsquare), Utility.gridsquareToLongitude(txGridsquare),
-                                                       Utility.gridsquareToLatitude(rxGridsquare), Utility.gridsquareToLongitude(rxGridsquare));
-                }  // parse the html
+                // Get rid of "&nbsp;" (non-break space character)
+                // Save timestamp as: "yyyyMMddHHmmssSSS"
+                timestamp = parseTimestamp(wsprTDRow.get(wsprnetIdxTimestamp).text().replace(Utility.NBSP, ' ').replace(" .", ".").replace(".0000", emptyString).trim());
+                txCallsign = wsprTDRow.get(wsprnetIdxTxCallsign).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
+                txFreqMhz = Double.parseDouble(wsprTDRow.get(wsprnetIdxTxFreqMhz).text().replace(Utility.NBSP, ' ').trim());
+                rxSnr = Double.parseDouble(wsprTDRow.get(wsprnetIdxRxSnr).text().replace(Utility.NBSP, ' ').trim());
+                rxDrift = Double.parseDouble(wsprTDRow.get(wsprnetIdxRxDrift).text().replace(Utility.NBSP, ' ').trim());
+                txGridsquare = wsprTDRow.get(wsprnetIdxTxGridsquare).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
+                txPower = Double.parseDouble(wsprTDRow.get(wsprnetIdxTxPowerDbm).text().replace(Utility.NBSP, ' ').trim());
+                rxCallsign = wsprTDRow.get(wsprnetIdxRxCallsign).text().replace(Utility.NBSP, ' ').trim().toUpperCase();
+                rxGridsquare = wsprTDRow.get(wsprnetIdxRxGridsquare).text().replace(Utility.NBSP, ' ').trim(); // mixed case!
+                kmDistance = Double.parseDouble(wsprTDRow.get(wsprnetIdxDistanceKm).text().replace(Utility.NBSP, ' ').trim());
+                // Don't bother with 'miles'.
+                //miDistance = Double.parseDouble(wsprTDRow.get(WSPRNET_IDX_OLDDB_DISTANCE_MILES).text().replace(Utility.NBSP, ' ').trim());
+                // Azimuth is not provided in old database; calculate it ourselves for both old and new (drupal) databases.
+                //azimuth = Double.parseDouble(wsprTDRow.get(wsprnetIdxAzimuth).text().replace(Utility.NBSP, ' ').trim());
+                azimuth = Utility.latLongToAzimuth(Utility.gridsquareToLatitude(txGridsquare), Utility.gridsquareToLongitude(txGridsquare),
+                                                   Utility.gridsquareToLatitude(rxGridsquare), Utility.gridsquareToLongitude(rxGridsquare));
 
                 // Collect the values together.
                 ContentValues wsprValues = new ContentValues();
@@ -526,18 +511,29 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                 //         maybe some minimum number of reports at a minimum SNR.
                 try {
                     iTimestamp = Long.parseLong(timestamp.substring(0, WsprNetContract.TIMESTAMP_FORMAT_DB_SHORT.length()));
-                    if (   (cutoffNotifyTimeMin > 0) && (cutoffNotifyTimeMax > 0)
-                        && (cutoffNotifyTimeMin <= iTimestamp) && (iTimestamp < cutoffNotifyTimeMax)) {
+//                    if (   (cutoffNotifyTimeMin > 0) && (cutoffNotifyTimeMax > 0)
+//                        && (cutoffNotifyTimeMin <= iTimestamp) && (iTimestamp < cutoffNotifyTimeMax)) {
+                    if (isWithinTimeInterval(cutoffNotifyTimeMin, cutoffNotifyTimeMax, iTimestamp)) {
                         // getFrequencyBandCheck() will check what band the TX frequency is in.
                         // frequencyBandNotifyCheck will check if it is in the notification band.
-                        double bandMHz = getFrequencyBandCheck(context, txFreqMhz, mBandFrequencyTolerancePercent);
-                        bandOk = !bandEna || frequencyBandNotifyCheck(bandMHz, notifyBandMHzMin, notifyBandMHzMax);
-                        snrOk = !snrEna || (rxSnr >= minSNR);
-                        distanceOk = !distanceEna || (kmDistance >= notifyMinTxRxKm);
-                        txCallOk = !txCallEna || txCallsign.matches(notifyTxCallsign);
-                        rxCallOk = !rxCallEna || rxCallsign.matches(notifyRxCallsign);
-                        txGridOk = !txGridEna || txGridsquare.toUpperCase().matches(notifyTxGridsquare);
-                        rxGridOk = !rxGridEna || rxGridsquare.toUpperCase().matches(notifyRxGridsquare);
+                        double bandMHz = getFrequencyBandCheck(context, txFreqMhz, BandFrequencyTolerancePercent);
+//                        bandOk = !bandEna || frequencyBandNotifyCheck(bandMHz, notifyBandMHzMin, notifyBandMHzMax);
+//                        snrOk = !snrEna || (rxSnr >= minSNR);
+//                        distanceOk = !distanceEna || (kmDistance >= notifyMinTxRxKm);
+//                        txCallOk = !txCallEna || txCallsign.matches(notifyTxCallsign);
+//                        rxCallOk = !rxCallEna || rxCallsign.matches(notifyRxCallsign);
+//                        txGridOk = !txGridEna || txGridsquare.toUpperCase().matches(notifyTxGridsquare);
+//                        rxGridOk = !rxGridEna || rxGridsquare.toUpperCase().matches(notifyRxGridsquare);
+                        // Trivial mechanism to reduce cyclomatic complexity.
+                        bandOk     = evaluateOR(!bandEna, frequencyBandNotifyCheck(bandMHz, notifyBandMHzMin, notifyBandMHzMax));
+                        snrOk      = evaluateOR(!snrEna, (rxSnr >= minSNR));
+                        distanceOk = evaluateOR(!distanceEna, (kmDistance >= notifyMinTxRxKm));
+                        txCallOk   = evaluateOR(!txCallEna, txCallsign.matches(notifyTxCallsign));
+                        rxCallOk   = evaluateOR(!rxCallEna, rxCallsign.matches(notifyRxCallsign));
+                        txGridOk   = evaluateOR(!txGridEna, txGridsquare.toUpperCase().matches(notifyTxGridsquare));
+                        rxGridOk   = evaluateOR(!rxGridEna, rxGridsquare.toUpperCase().matches(notifyRxGridsquare));
+
+
                         // TODO:  is the Java compiler inlining this?  It's in a loop processing lots of data!
                         if (checkNotifyConditions(bandOk, snrOk, distanceOk, txCallOk, rxCallOk, txGridOk, rxGridOk)) {
                             nHits++;
@@ -579,8 +575,8 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
 
             // Did any reports meet the notification criteria?
             if (nHits > 0) {
-                String bandName = "";
-                String description = "";
+                String bandName = emptyString;
+                String description = emptyString;
                 description = createNotifyDescription(context, notifyMinTxRxKm,
                                 nHitsTxCall, nHitsRxCall, nHitsTxGrid, nHitsRxGrid, nHitsDistance,
                                 displayTxCallsign, displayRxCallsign,
@@ -595,6 +591,10 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         }
     } // getWsprDataFromTags()
 
+    private boolean isWithinTimeInterval(long timeMin, long timeMax, long timestamp) {
+        return (   (timeMin > 0) && (timeMax > 0)
+                && (timeMin <= timestamp) && (timestamp < timeMax));
+    }
     private boolean checkNotifyConditions(boolean bandOk, boolean snrOk, boolean distanceOk,
                                           boolean txCallOk, boolean rxCallOk, boolean txGridOk,
                                           boolean rxGridOk) {
@@ -616,19 +616,19 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
                                            int nHitsTxGrid, int nHitsRxGrid, int nHitsDistance,
                                            String displayTxCallsign, String displayRxCallsign,
                                            String displayTxGridsquare, String displayRxGridsquare) {
-        String description = "";
+        String description = emptyString;
 
         if (nHitsTxCall > 0) {
-            description += " " + context.getString(R.string.pref_filter_label_tx_callsign) + "=" + displayTxCallsign + ";";
+            description += oneSpaceString + context.getString(R.string.pref_filter_label_tx_callsign) + equalSignString + displayTxCallsign + semicolonString;
         }
         if (nHitsRxCall > 0) {
-            description += " " + context.getString(R.string.pref_filter_label_rx_callsign) + "=" + displayRxCallsign + ";";
+            description += oneSpaceString + context.getString(R.string.pref_filter_label_rx_callsign) + equalSignString + displayRxCallsign + semicolonString;
         }
         if (nHitsTxGrid > 0) {
-            description += " " + context.getString(R.string.pref_filter_label_tx_gridsquare) + "=" + displayTxGridsquare + ";";
+            description += oneSpaceString + context.getString(R.string.pref_filter_label_tx_gridsquare) + equalSignString + displayTxGridsquare + semicolonString;
         }
         if (nHitsRxGrid > 0) {
-            description += " " + context.getString(R.string.pref_filter_label_rx_gridsquare) + "=" + displayRxGridsquare + ";";
+            description += oneSpaceString + context.getString(R.string.pref_filter_label_rx_gridsquare) + equalSignString + displayRxGridsquare + semicolonString;
         }
         if (nHitsDistance > 0) {
             // TODO: Display either km or miles.  See SettingsActivity.java, onPreferenceChange().
@@ -656,6 +656,13 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
     private int convertBooleanANDPairToInt(boolean b1, boolean b2) {
         return (b1 && b2) ? 1 : 0;
     }
+    // Converts boolean OR to boolean
+    // Trivial method to reduce cyclomatic complexity.
+    private boolean evaluateOR(boolean b1, boolean b2) {
+        return (b1 || b2);
+    }
+    
+    
     // Make a notification to the user about propagation conditions; they'll want to get on the air now!
     // Notifications must be enabled in the user preferences, and don't notify any more often than
     // specified in the preferences (the "discard data after ..." cutoff value does double duty.)
@@ -675,8 +682,6 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
             long prefMillis = 1000*(long)Utility.cutoffSeconds(context);
             String lastNotificationKey = context.getString(R.string.pref_last_notification);
             long lastNotification = prefs.getLong(lastNotificationKey, 0);
-            Date now  = new Date(System.currentTimeMillis());
-            Date last = new Date(lastNotification);
 
             if ((System.currentTimeMillis() - lastNotification) >= prefMillis) {
                 // It's been long enough since the last notification; send a new one now.
@@ -776,7 +781,7 @@ public class WsprNetViewerSyncAdapter extends AbstractThreadedSyncAdapter {
         if (null == accountManager.getPassword(newAccount)) {
             // Add the account and account type, no password or user data
             // If successful, return the Account object, otherwise report an error.
-        boolean ret = accountManager.addAccountExplicitly(newAccount, "", null);
+        boolean ret = accountManager.addAccountExplicitly(newAccount, emptyString, null);
             if (!ret) {
                 return null;
             }

@@ -203,14 +203,13 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
         if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
             mPosition = savedInstanceState.getInt(SELECTED_KEY);
         }
-        mWsprAdapter.setUseDualPane(mDualPane);
         return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         // TODO: should this be getSupportLoaderManager?
-        getLoaderManager().initLoader(WSPR_LOADER, null, this); // TODO: should this be getSupportLoaderManager?
+        getLoaderManager().initLoader(WSPR_LOADER, null, this);
         super.onActivityCreated(savedInstanceState);
     }
 
@@ -349,10 +348,7 @@ public class WsprFragment extends Fragment implements LoaderCallbacks<Cursor> {
         mWsprAdapter.swapCursor(null);
     }
 
-    public void setDualPane(boolean dualPane) {
-        mDualPane = dualPane;
-        if (mWsprAdapter != null) {
-            mWsprAdapter.setUseDualPane(mDualPane);
-        }
+    public boolean getDualPane() {
+        return mDualPane;
     }
 }

@@ -173,6 +173,7 @@
     <string name="pref_filter_match_all_default" translatable="false">false</string>
 
     <!-- Google Maps Types -->
+    <string name="propagation_maps_not_available">Sorry, propagation map is not available.</string>
     <string name="propagation_maps_location_services_label">Location Updates</string>
     <string name="propagation_maps_settings_label">Map settings</string>
     <string name="propagation_maps_long_click_to_set_qth">Long-click on map to set QTH gridsquare.</string>
@@ -212,15 +213,7 @@
     <string name="url_wsprnet_spots_old" formatted="false">http://wsprnet.org/olddb?mode=html\u0026band=all\u0026limit=500\u0026findcall=\u0026findreporter=\u0026sort=date</string>
     <!-- wsprnet.org/drupal/wsprnet/spots permits queries only through the Drupal forms interface -->
     <string name="url_wsprnet_spots">http://wsprnet.org/drupal/wsprnet/spots</string>
-    <string name="file_wsprnet_spots_prefix">file:</string>
     <string name="file_wsprnet_spots">file:Database _ WSPRnet.htm</string>
-    <string name="html_wsprnet_spots_prefix">html:</string>
-    <!-- Sample web page #1 from http://www.wsprnet.org/drupal/wsprnet/spots -->
-    <!-- View page source from Firefox/Chrome (<ctrl><U>), then encode using Notepad++...Plug-ins...mime tools...full URL encode -->
-    <string name="html_wsprnet_spots_data11"></string>
-    <string name="html_wsprnet_spots_data12"></string>
-    <string name="html_wsprnet_spots_data13"></string>
-    <string name="html_wsprnet_spots_data14"></string>
     <!-- 'Empty' web page; this is the default data if the live website access fails. -->
     <string name="html_empty_page">%20%20%20%20%20%20%20%20%3C%21%44%4F%43%54%59%50%45%20%68%74%6D%6C%20%50%55%42%4C%49%43%20%22%2D%2F%2F%57%33%43%2F%2F%44%54%44%20%58%48%54%4D%4C%2B%52%44%46%61%20%31%2E%30%2F%2F%45%4E%22%20%20%22%68%74%74%70%3A%2F%2F%77%77%77%2E%77%33%2E%6F%72%67%2F%4D%61%72%6B%55%70%2F%44%54%44%2F%78%68%74%6D%6C%2D%72%64%66%61%2D%31%2E%64%74%64%22%3E%0D%0A%20%20%20%20%20%20%20%20%3C%68%74%6D%6C%20%78%6D%6C%6E%73%3D%22%68%74%74%70%3A%2F%2F%77%77%77%2E%77%33%2E%6F%72%67%2F%31%39%39%39%2F%78%68%74%6D%6C%22%20%78%6D%6C%3A%6C%61%6E%67%3D%22%65%6E%22%20%76%65%72%73%69%6F%6E%3D%22%58%48%54%4D%4C%2B%52%44%46%61%20%31%2E%30%22%20%64%69%72%3D%22%6C%74%72%22%3E%0D%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%62%6F%64%79%3E%20%20%3C%2F%62%6F%64%79%3E%0D%0A%20%20%20%20%20%20%20%20%3C%2F%68%74%6D%6C%3E</string>
 
