@@ -1,4 +1,15 @@
 
+
+2014-12-03 v0.17
+Now with great circle and heat map plotting on Google maps!
+Something to try out:
+  Tap 'Map' near the top of the screen.
+  Long-click a location on the map to set your QTH.
+  In the Maps settings, turn on TX markers.
+  Zoom in on a marker to click it; the pop-up displays the beacon data.
+  Touch the pop-up to display the directional antenna heading from your QTH to the beacon.
+Note: Google maps with the large number of beacons is resource intensive.  Performance on older devices, Gingerbread/Android 2.3 and below, will be slower.
+
 2014-10-24 v0.16
 Added additional notification settings and notification filtering.
 Notifications are now only applied to WSPRs with a time stamp in the update interval.
