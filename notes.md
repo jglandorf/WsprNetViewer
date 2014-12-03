@@ -1,7 +1,8 @@
 ## Procedures
 ### Release Procedure
 1.  Test the Debug version.
-2.  Ensure "write to SD card" permission is disabled in app/src/main/AndroidManifest.xml:</br>
+2.  Verify that Git is set to the desired branch.</br>
+    For the master branch (without Google Maps), ensure "write to SD card" permission is disabled in app/src/main/AndroidManifest.xml (for branchMaps, this permission is required by Google Maps):</br>
     ```xml
     <!-- uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /-->
     ```
