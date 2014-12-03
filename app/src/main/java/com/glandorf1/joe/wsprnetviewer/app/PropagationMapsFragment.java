@@ -523,7 +523,7 @@ public class PropagationMapsFragment extends Fragment
                 updated = true;
             } else {
                 // Set the preference for all items within the layout.
-                String s = ((CheckBox) view).getText().toString();
+                String s = ((CheckBox) view).getText().toString().trim();
                 boolean all = s.equals(getResources().getString(R.string.string_select_all));
                 GridLayout layout = (GridLayout) view.getParent();
                 for (int i = 0; i < layout.getChildCount(); i++) {

@@ -5,20 +5,22 @@
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.glandorf1.joe.wsprnetviewer.app"
-    android:versionCode="10"
-    android:versionName="0.17beta3" >
+    android:versionCode="11"
+    android:versionName="0.17beta4" >
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS" />
     <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
     <!-- If we enable dump-to-SD-card, WRITE_EXTERNAL_STORAGE will need to be set. -->
-    <!-- TODO: determine if we can check for WRITE_EXTERNAL_STORAGE permission at compile/runtime. -->
+    <!-- We could determine if we can check for WRITE_EXTERNAL_STORAGE permission at compile/runtime,
+         but it is a moot point when using Google maps (it needs the permission anyway.) -->
     <!-- uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" / -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <!-- The Maps API requires the additional following permissions -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--
  The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but are recommended.

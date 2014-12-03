@@ -62,6 +62,7 @@ public class MainActivity extends ActionBarActivity
         setContentView(R.layout.activity_main); // WsprFragment gets created here.
         // Display EULA
         new SimpleEula(this).show();
+        // TODO: removed 'dual-pane' for now-- needs to be more sophisticated when using a ViewPager.
 //        // WsprFragment is now declared directly in layout xml file.
 //        if (findViewById(R.id.wspr_detail_container) != null) {
 //            // The detail container view will be present only in the large-screen layouts

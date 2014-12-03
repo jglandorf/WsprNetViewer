@@ -46,7 +46,7 @@
             android:textAppearance="?android:attr/textAppearanceMedium"
             android:text="@string/string_press_done_on_keyboard"
             android:textColor="@color/wspr_brown"
-            android:textStyle="italic" />
+            />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -74,7 +74,9 @@
                 android:singleLine="true"
                 android:tag="@string/pref_filter_map_key_tx_callsign"
                 android:text="@string/pref_filter_label_tx_callsign"
-                android:textAppearance="?android:textAppearanceLarge" />
+                android:textAppearance="?android:textAppearanceLarge"
+                android:minWidth="120dp"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -103,7 +105,9 @@
                 android:singleLine="true"
                 android:tag="@string/pref_filter_map_key_rx_callsign"
                 android:text="@string/pref_filter_label_rx_callsign"
-                android:textAppearance="?android:textAppearanceLarge" />
+                android:textAppearance="?android:textAppearanceLarge"
+                android:minWidth="120dp"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -132,7 +136,9 @@
                 android:singleLine="true"
                 android:tag="@string/pref_filter_map_key_tx_gridsquare"
                 android:text="@string/pref_filter_label_tx_gridsquare"
-                android:textAppearance="?android:textAppearanceLarge" />
+                android:textAppearance="?android:textAppearanceLarge"
+                android:minWidth="120dp"
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -163,6 +169,7 @@
                 android:text="@string/pref_filter_label_rx_gridsquare"
                 android:textAppearance="?android:textAppearanceLarge"
                 android:nextFocusDown="@id/propagation_maps_filter_tx_callsign"
+                android:minWidth="120dp"
                 />
         </LinearLayout>
     </LinearLayout>

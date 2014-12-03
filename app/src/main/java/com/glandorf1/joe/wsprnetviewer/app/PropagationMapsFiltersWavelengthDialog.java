@@ -103,14 +103,19 @@ public class PropagationMapsFiltersWavelengthDialog extends DialogFragment {
             cb.setFocusable(true);
             cb.setPadding(0, 0, 4, 0);
             cb.setTextAppearance(getActivity(), R.style.WsprTextAppearanceMedium);
-            cb.setText(cbWavelengthText[i]);
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+                cb.setTextColor(getResources().getColor(R.color.white));
+                cb.setText("         " + cbWavelengthText[i]); // hack: text begins at left edge of checkbox, so start over to the right a bit
+            } else {
+                cb.setText(cbWavelengthText[i]);
+            }
             // Tag is the key prefix and option suffix:
             //   "pref_map_band_any"
             //   "pref_map_band_17m"
             String key = getResources().getString(R.string.pref_map_band_key_) + cbWavelengthText[i];
             cb.setTag(key);
             // skip the 'any' checkbox
-            if (!cb.getText().equals(labelAny)) {
+            if (!cbWavelengthText[i].equals(labelAny)) {
                 boolean defaultValue = true; // Boolean.parseBoolean(getActivity().getString(R.string.pref_filter_enable_default));
                 boolean checked = prefs.getBoolean(cb.getTag().toString(), defaultValue);
                 cb.setChecked(checked);
@@ -129,6 +134,10 @@ public class PropagationMapsFiltersWavelengthDialog extends DialogFragment {
         cbFilterWavelengthAll.setOnClickListener(onClick);
         cbFilterWavelengthNone = (CheckBox) rootView.findViewById(R.id.propagation_maps_filter_wavelength_none);
         cbFilterWavelengthNone.setOnClickListener(onClick);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.ICE_CREAM_SANDWICH) {
+            cbFilterWavelengthAll.setText( "      " + cbFilterWavelengthAll.getText()); // hack: text begins at left edge of checkbox, so start over to the right a bit
+            cbFilterWavelengthNone.setText("      " + cbFilterWavelengthNone.getText()); // hack: text begins at left edge of checkbox, so start over to the right a bit
+        }
         return rootView;
     }
 
